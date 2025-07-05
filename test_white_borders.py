@@ -35,7 +35,7 @@ def create_test_image_without_borders():
 
 def test_white_border_detection():
     """Test detekce bílých okrajů"""
-    print("🧪 Test detekce bílých okrajů...")
+    print("Test detekce bílých okrajů...")
     
     engine = SpadavkaEngine(spadavka_size_mm=3)
     
@@ -111,7 +111,7 @@ def test_border_detection_algorithm():
 
 def main():
     """Hlavní testovací funkce"""
-    print("🚀 Test inteligentní detekce bílých okrajů")
+    print("Test inteligentní detekce bílých okrajů")
     print("=" * 60)
     
     test_border_detection_algorithm()

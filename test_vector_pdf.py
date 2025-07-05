@@ -69,7 +69,7 @@ def create_raster_test_pdf():
 
 def test_vector_processing():
     """Test vektorového zpracování PDF"""
-    print("🧪 Test vektorového zpracování PDF...")
+    print("Test vektorového zpracování PDF...")
     
     engine = SpadavkaEngine(spadavka_size_mm=3)
     
@@ -170,7 +170,7 @@ def test_quality_comparison():
 
 def main():
     """Hlavní testovací funkce"""
-    print("🚀 Test vektorového zpracování PDF s zachováním kvality")
+    print("Test vektorového zpracování PDF s zachováním kvality")
     print("=" * 70)
     
     test_vector_processing()

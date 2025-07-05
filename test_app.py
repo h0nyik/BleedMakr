@@ -23,7 +23,7 @@ def create_test_image():
 
 def test_image_processing():
     """Test zpracování obrázku"""
-    print("🧪 Test zpracování obrázku...")
+    print("Test zpracování obrázku...")
     
     # Vytvoření testovacího obrázku
     test_img = create_test_image()
@@ -65,7 +65,7 @@ def test_image_processing():
 
 def test_engine_validation():
     """Test validace engine"""
-    print("\n🧪 Test validace engine...")
+    print("\nTest validace engine...")
     
     engine = SpadavkaEngine(spadavka_size_mm=3)
     
@@ -111,7 +111,7 @@ def test_engine_validation():
 
 def test_preview_quality():
     """Test výpočtu kvality náhledu"""
-    print("\n🧪 Test výpočtu kvality náhledu...")
+    print("\nTest výpočtu kvality náhledu...")
     
     # Simulace různých velikostí souborů
     test_sizes = [
@@ -165,7 +165,7 @@ def test_preview_quality():
 
 def main():
     """Hlavní testovací funkce"""
-    print("🚀 Spouštím testy Generator Spadávek...")
+    print("Spouštím testy Generator Spadávek...")
     print("=" * 50)
     
     tests = [

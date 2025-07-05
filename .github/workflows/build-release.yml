@@ -1,0 +1,74 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+        
+    - name: Build executable
+      run: |
+        pyinstaller --onefile --windowed --name BleedMakr spadavka_generator.py
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: BleedMakr-exe
+        path: dist/BleedMakr.exe
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## BleedMakr ${{ github.ref_name }}
+          
+          ### Co je nového:
+          - Automatické generování spadávek pro tiskové PDF
+          - Inteligentní detekce bílých okrajů
+          - Podpora formátů: PDF, EPS, TIFF, JPG, PNG
+          - Moderní GUI s náhledem a logem operací
+          
+          ### Instalace:
+          1. Stáhněte `BleedMakr.exe`
+          2. Spusťte soubor
+          3. Není potřeba instalace Pythonu
+          
+          ### Poznámky:
+          - Pre-release verze pro testování
+          - Spusťte jako administrátor pro lepší kompatibilitu
+        draft: false
+        prerelease: true
+        
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/BleedMakr.exe
+        asset_name: BleedMakr-${{ github.ref_name }}.exe
+        asset_content_type: application/octet-stream 

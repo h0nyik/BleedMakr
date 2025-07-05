@@ -240,7 +240,7 @@ def test_pdf_conversion():
 
 def main():
     """Hlavní testovací funkce"""
-    print("🚀 Test nové funkcionality zpracování PDF")
+    print("Test nové funkcionality zpracování PDF")
     print("=" * 60)
     
     test_pdf_conversion()

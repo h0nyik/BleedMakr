@@ -35,7 +35,7 @@ except ImportError:
 class SpadavkaGenerator:
     def __init__(self, root):
         self.root = root
-        self.root.title("Generator Spadávek - Reklamní Agentura")
+        self.root.title("BleedMakr v0.0.1 - Generator Spadávek")
         self.root.geometry("1000x700")
         self.root.configure(bg='#f0f0f0')
         
@@ -89,7 +89,7 @@ class SpadavkaGenerator:
         title_frame.pack(fill='x', padx=20, pady=20)
         
         title_label = ttk.Label(title_frame, 
-                               text="🎨 Generator Spadávek",
+                               text="🎨 BleedMakr v0.0.1",
                                style='Title.TLabel')
         title_label.pack()
         
