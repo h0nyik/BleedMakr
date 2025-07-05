@@ -1,0 +1,120 @@
+name: Build EXE Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Spustí se při push tag začínajícího v (např. v0.0.1)
+  workflow_dispatch:  # Umožní manuální spuštění
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+        
+    - name: Download UPX
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/upx/upx/releases/download/v4.2.2/upx-4.2.2-win64.zip" -OutFile "upx.zip"
+        Expand-Archive -Path "upx.zip" -DestinationPath "."
+        Move-Item "upx-4.2.2-win64\upx.exe" "upx.exe"
+        echo "$PWD" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        
+    - name: Build EXE
+      run: |
+        python build_exe.py
+        
+    - name: Test EXE
+      run: |
+        if (Test-Path "dist/BleedMakr.exe") {
+          Write-Host "✅ BleedMakr.exe byl úspěšně vytvořen"
+          $size = (Get-Item "dist/BleedMakr.exe").Length / 1MB
+          Write-Host "   Velikost: $([math]::Round($size, 1)) MB"
+        } else {
+          Write-Host "❌ BleedMakr.exe nebyl vytvořen"
+          exit 1
+        }
+        
+    - name: Get version
+      id: version
+      run: |
+        $version = Get-Content "version.txt" -Raw
+        $version = $version.Trim()
+        echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.version.outputs.VERSION }}
+        release_name: BleedMakr v${{ steps.version.outputs.VERSION }}
+        body: |
+          # BleedMakr v${{ steps.version.outputs.VERSION }}
+          
+          ## 🎨 Profesionální generátor spadávek pro reklamní agentury
+          
+          ### ✨ Funkce:
+          - ✅ **Perfektní napojení spadávky** s color matching algoritmem
+          - ✅ **Zachování vektorové kvality** PDF
+          - ✅ **Inteligentní detekce okrajů** s automatickým ořezáním
+          - ✅ **Moderní GUI** s drag&drop podporou
+          - ✅ **Podpora formátů**: PDF, EPS, PNG, JPG, TIFF
+          - ✅ **Batch zpracování** více souborů
+          - ✅ **Export do PDF** s vysokým rozlišením (300 DPI)
+          
+          ### 📋 Požadavky:
+          - **Windows 10/11** (64-bit)
+          - **Minimálně 4GB RAM**
+          - **500MB volného místa**
+          - **Ghostscript** (pro EPS soubory) - volitelné
+          
+          ### 🚀 Instalace:
+          1. Stáhněte `BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip`
+          2. Rozbalte do libovolné složky
+          3. Spusťte `BleedMakr.exe`
+          
+          ### 🔧 Použití:
+          1. Přetáhněte soubory do aplikace nebo klikněte "Přidat soubory"
+          2. Nastavte velikost spadávky (výchozí: 3 mm)
+          3. Vyberte výstupní složku
+          4. Klikněte "Generovat spadávky"
+          
+          ---
+          
+          **Licence:** AGPL-3.0 | **Podpora:** [GitHub Issues](https://github.com/h0nyik/BleedMakr/issues)
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
+        asset_name: BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
+        asset_content_type: application/zip
+        
+    - name: Upload EXE Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/BleedMakr.exe
+        asset_name: BleedMakr.exe
+        asset_content_type: application/octet-stream 
