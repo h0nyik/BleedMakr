@@ -309,4 +309,16 @@ settings.ini
 *.save
 
 # Lock files
-*.lock 
+*.lock
+
+# Build artefakty
+release/
+*.zip
+*.exe
+__pycache__/
+*.pyc
+*.pyo
+*.bak
+*.tmp
+.venv/
+version_info.txt 
