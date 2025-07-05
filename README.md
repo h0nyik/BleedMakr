@@ -3,7 +3,8 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-AGPL%203.0-green.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://www.microsoft.com/windows)
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg)](https://github.com/yourusername/BleedMakr)
+[![Status](https://img.shields.io/badge/Status-Pre%20Alpha-orange.svg)](https://github.com/h0nyik/BleedMakr)
+[![Version](https://img.shields.io/badge/Version-0.0.1-blue.svg)](https://github.com/h0nyik/BleedMakr/releases)
 
 **Profesionální generátor spadávek pro reklamní agentury**
 
@@ -33,7 +34,7 @@ BleedMakr je nástroj pro automatické generování spadávek (bleed) pro tiskov
 
 ### 1. Klonování repository
 ```bash
-git clone https://github.com/yourusername/BleedMakr.git
+git clone https://github.com/h0nyik/BleedMakr.git
 cd BleedMakr
 ```
 
@@ -167,7 +168,7 @@ Příspěvky jsou vítány! Prosím:
 ## 📞 Podpora
 
 Pro technickou podporu:
-- Otevřete [Issue](https://github.com/yourusername/BleedMakr/issues) na GitHubu
+- Otevřete [Issue](https://github.com/h0nyik/BleedMakr/issues) na GitHubu
 - Kontaktujte vývojový tým
 
 ## 📄 Licence

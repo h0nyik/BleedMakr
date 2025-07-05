@@ -1,0 +1,114 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Semantic Versioning Rules pro BleedMakr
+
+## Verzování podle semver.org
+
+Před každým commit a push na GitHub MUSÍŠ zkontrolovat a případně upravit verzi podle těchto pravidel:
+
+### Formát verze: MAJOR.MINOR.PATCH
+- **MAJOR** - Nezpětně kompatibilní změny API
+- **MINOR** - Zpětně kompatibilní nové funkce  
+- **PATCH** - Zpětně kompatibilní opravy chyb
+
+### Pravidla pro zvýšení verze:
+
+**MAJOR (X.0.0) - zvýšit když:**
+- Změny v API, které nejsou zpětně kompatibilní
+- Přidání nových povinných parametrů
+- Odstranění funkcí nebo metod
+- Změny v datových strukturách
+- Přepracování architektury aplikace
+
+**MINOR (0.X.0) - zvýšit když:**
+- Přidání nových funkcí (zpětně kompatibilní)
+- Nové volitelné parametry
+- Vylepšení existujících funkcí
+- Nové formáty podporovaných souborů
+- Přidání nových GUI prvků
+
+**PATCH (0.0.X) - zvýšit když:**
+- Opravy chyb
+- Vylepšení výkonu
+- Opravy v dokumentaci
+- Kosmetické změny v GUI
+- Opravy v testech
+
+### Soubory k úpravě při změně verze:
+
+1. **version.txt** - hlavní soubor s verzí
+2. **README.md** - badge s verzí
+3. **spadavka_generator.py** - verze v aplikaci
+4. **Git tag** - vytvořit tag po push
+
+### Commit message formát:
+```
+feat: přidána podpora pro nový formát souborů (MINOR)
+fix: oprava chyby při zpracování PDF (PATCH)  
+BREAKING CHANGE: změněno API pro zpracování (MAJOR)
+```
+
+### Automatické akce před push:
+1. Zkontroluj změny v kódu
+2. Urči typ změny (MAJOR/MINOR/PATCH)
+3. Uprav version.txt
+4. Aktualizuj README.md badge
+5. Commit s popisným message
+6. Push na GitHub
+7. Vytvoř Git tag
+
+### Soubor version.txt:
+Vytvoř soubor `version.txt` s obsahem:
+```
+0.0.1
+```
+
+### Příklad workflow:
+1. Udělal jsem změny → analyzuj typ
+2. Typ: oprava chyby → PATCH (0.0.1 → 0.0.2)
+3. Uprav version.txt na "0.0.2"
+4. Commit: "fix: oprava chyby při zpracování EPS souborů"
+5. Push
+6. Git tag v0.0.2
+
+### GitHub Actions pro automatické tagování:
+Přidej do .github/workflows/versioning.yml:
+```yaml
+name: Auto Versioning
+on:
+  push:
+    branches: [master]
+jobs:
+  version:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Semantic Version
+        id: version
+        uses: paulhatch/semantic-version@v5.4.0
+      - name: Create Tag
+        run: git tag v${{ steps.version.outputs.version }}
+      - name: Push Tags
+        run: git push origin --tags
+```
+
+### Důležité poznámky:
+- Začínáme s verzí 0.0.1 protože jsme v úplně počáteční fázi vývoje
+- Verze 0.1.0 bude až když bude základní API definované
+- Verze 1.0.0 bude až když bude API stabilní a připravené pro produkci
+- Každá změna MUSÍ být commitována s popisným message
+- Tagy se vytvářejí pouze pro stabilní verze
+- Pre-release verze používají suffix (např. 0.0.1-alpha.1)
+- Build metadata se přidává za + (např. 0.0.1+build.123)
+
+### Kontrolní seznam před každým push:
+- [ ] Určil jsem správný typ změny
+- [ ] Upravil jsem version.txt
+- [ ] Aktualizoval jsem README.md badge
+- [ ] Commit message je popisný
+- [ ] Vytvořím Git tag po push 
