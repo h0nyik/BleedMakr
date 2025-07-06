@@ -204,7 +204,7 @@ exe = EXE(
     with open('BleedMakr.spec', 'w', encoding='utf-8') as f:
         f.write(spec_content)
     
-    print("✅ Vytvořen optimalizovaný .spec soubor")
+    print("OK: Vytvoren optimalizovany .spec soubor")
 
 def create_version_info():
     """Vytvoří version info soubor pro Windows exe"""
@@ -256,11 +256,11 @@ VSVersionInfo(
     with open('version_info.txt', 'w', encoding='utf-8') as f:
         f.write(version_info)
     
-    print("✅ Vytvořen version info soubor")
+    print("OK: Vytvoren version info soubor")
 
 def install_dependencies():
     """Nainstaluje PyInstaller a další závislosti"""
-    print("🔧 Instalace PyInstaller a UPX...")
+    print("Instalace PyInstaller a UPX...")
     
     # Instalace PyInstaller
     if not run_command("pip install pyinstaller", "Instalace PyInstaller"):
@@ -268,16 +268,16 @@ def install_dependencies():
     
     # Kontrola UPX (pro kompresi)
     if not shutil.which('upx'):
-        print("⚠️  UPX není nainstalován - .exe bude větší")
-        print("   Můžete stáhnout z: https://upx.github.io/")
+        print("INFO: UPX neni nainstalovan - .exe bude vetsi")
+        print("   Muzete stahnout z: https://upx.github.io/")
     else:
-        print("✅ UPX je k dispozici pro kompresi")
+        print("OK: UPX je k dispozici pro kompresi")
     
     return True
 
 def build_exe():
     """Sestaví .exe soubor"""
-    print("\n🚀 Sestavování .exe souboru...")
+    print("\nSestavovani .exe souboru...")
     
     # Vyčištění předchozích buildů
     for dir_name in ['build', 'dist', '__pycache__']:
@@ -294,16 +294,16 @@ def build_exe():
     exe_path = Path("dist/BleedMakr.exe")
     if exe_path.exists():
         size_mb = exe_path.stat().st_size / (1024 * 1024)
-        print(f"✅ Úspěšně vytvořen: {exe_path}")
+        print(f"OK: Uspechne vytvoren: {exe_path}")
         print(f"   Velikost: {size_mb:.1f} MB")
         return True
     else:
-        print("❌ .exe soubor nebyl vytvořen")
+        print("CHYBA: .exe soubor nebyl vytvoren")
         return False
 
 def create_release_package():
     """Vytvoří balíček pro release"""
-    print("\n📦 Vytváření release balíčku...")
+    print("\nVytvareni release balicku...")
     
     release_dir = Path("release")
     if release_dir.exists():
@@ -327,21 +327,21 @@ def create_release_package():
     # Vytvoření ZIP archivu
     zip_name = "BleedMakr-v0.0.1-Windows-x64"
     shutil.make_archive(zip_name, 'zip', release_dir)
-    print(f"✅ Vytvořen release balíček: {zip_name}.zip")
+    print(f"OK: Vytvoren release balicek: {zip_name}.zip")
     
     return f"{zip_name}.zip"
 
 def main():
     """Hlavní funkce build procesu"""
-    print("🎨 BleedMakr - Build .exe release")
+    print("BleedMakr - Build .exe release")
     print("=" * 50)
     
     # Kontrola Python verze
     if sys.version_info < (3, 8):
-        print("❌ Vyžaduje Python 3.8+")
+        print("CHYBA: Vyzdauje Python 3.8+")
         return False
     
-    print(f"✅ Python {sys.version}")
+    print(f"OK: Python {sys.version}")
     
     # Instalace závislostí
     if not install_dependencies():
@@ -358,10 +358,10 @@ def main():
     # Vytvoření release balíčku
     zip_file = create_release_package()
     
-    print("\n🎉 Build dokončen úspěšně!")
+    print("\nBuild dokoncen uspesne!")
     print(f"   .exe soubor: dist/BleedMakr.exe")
-    print(f"   Release balíček: {zip_file}")
-    print("\nNyní můžete nahrát na GitHub jako release.")
+    print(f"   Release balicek: {zip_file}")
+    print("\nNyni muzete nahrat na GitHub jako release.")
     
     return True
 
