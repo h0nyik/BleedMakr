@@ -57,48 +57,48 @@ class TestBleedMakrApp(unittest.TestCase):
 
 def run_basic_tests():
     """Spuštění základních testů"""
-    print("🧪 Spouštím základní testy BleedMakr...")
+    print("Spoustim zakladni testy BleedMakr...")
     
     # Test importů
     try:
         import PIL
-        print("✅ PIL/Pillow importován")
+        print("OK: PIL/Pillow importovan")
     except ImportError:
-        print("❌ PIL/Pillow není nainstalován")
+        print("CHYBA: PIL/Pillow neni nainstalovan")
         return False
         
     try:
         import numpy
-        print("✅ NumPy importován")
+        print("OK: NumPy importovan")
     except ImportError:
-        print("❌ NumPy není nainstalován")
+        print("CHYBA: NumPy neni nainstalovan")
         return False
         
     try:
         import fitz  # PyMuPDF
-        print("✅ PyMuPDF importován")
+        print("OK: PyMuPDF importovan")
     except ImportError:
-        print("❌ PyMuPDF není nainstalován")
+        print("CHYBA: PyMuPDF neni nainstalovan")
         return False
         
     # Test engine
     try:
         engine = SpadavkaEngine()
-        print("✅ SpadavkaEngine inicializován")
+        print("OK: SpadavkaEngine inicializovan")
     except Exception as e:
-        print(f"❌ Chyba inicializace engine: {e}")
+        print(f"CHYBA: Chyba inicializace engine: {e}")
         return False
         
     # Test podporovaných formátů
     supported_formats = ['.pdf', '.eps', '.tiff', '.jpg', '.jpeg', '.png']
     for fmt in supported_formats:
         if engine.is_supported_format(f'test{fmt}'):
-            print(f"✅ Podporován formát: {fmt}")
+            print(f"OK: Podporovan format: {fmt}")
         else:
-            print(f"❌ Nepodporován formát: {fmt}")
+            print(f"CHYBA: Nepodporovan format: {fmt}")
             return False
             
-    print("✅ Všechny základní testy prošly!")
+    print("OK: Vsechny zakladni testy prosly!")
     return True
 
 if __name__ == "__main__":
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     
     # Spuštění unit testů
     if success:
-        print("\n🧪 Spouštím unit testy...")
+        print("\nSpoustim unit testy...")
         unittest.main(argv=[''], exit=False, verbosity=2)
     
-    print("\n✅ Testování dokončeno!") 
+    print("\nTestovani dokonceno!") 

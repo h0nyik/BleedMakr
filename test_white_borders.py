@@ -97,34 +97,34 @@ class TestWhiteBorders(unittest.TestCase):
 
 def run_white_border_tests():
     """Spuštění testů detekce bílých okrajů"""
-    print("🧪 Spouštím testy detekce bílých okrajů...")
+    print("Spoustim testy detekce bilych okraju...")
     
     # Test základní funkčnosti
     try:
         engine = SpadavkaEngine()
-        print("✅ SpadavkaEngine inicializován")
+        print("OK: SpadavkaEngine inicializovan")
     except Exception as e:
-        print(f"❌ Chyba inicializace engine: {e}")
+        print(f"CHYBA: Chyba inicializace engine: {e}")
         return False
         
     # Test vytvoření testovacích obrázků
     try:
         test_img = np.ones((50, 50, 3), dtype=np.uint8) * 255
         pil_img = Image.fromarray(test_img)
-        print("✅ Testovací obrázek vytvořen")
+        print("OK: Testovaci obrazek vytvoren")
     except Exception as e:
-        print(f"❌ Chyba vytvoření testovacího obrázku: {e}")
+        print(f"CHYBA: Chyba vytvoreni testovaciho obrazku: {e}")
         return False
         
     # Test detekce bílých okrajů
     try:
         borders = engine.detect_white_borders(pil_img)
-        print("✅ Detekce bílých okrajů funkční")
+        print("OK: Detekce bilych okraju funkcni")
     except Exception as e:
-        print(f"❌ Chyba detekce bílých okrajů: {e}")
+        print(f"CHYBA: Chyba detekce bilych okraju: {e}")
         return False
         
-    print("✅ Všechny testy detekce bílých okrajů prošly!")
+    print("OK: Vsechny testy detekce bilych okraju prosly!")
     return True
 
 if __name__ == "__main__":
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     
     # Spuštění unit testů
     if success:
-        print("\n🧪 Spouštím unit testy...")
+        print("\nSpoustim unit testy...")
         unittest.main(argv=[''], exit=False, verbosity=2)
     
-    print("\n✅ Testování detekce bílých okrajů dokončeno!") 
+    print("\nTestovani detekce bilych okraju dokonceno!") 

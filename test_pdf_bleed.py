@@ -123,44 +123,44 @@ class TestPDFBleed(unittest.TestCase):
 
 def run_pdf_bleed_tests():
     """Spuštění testů PDF spadávek"""
-    print("🧪 Spouštím testy PDF spadávek...")
+    print("Spoustim testy PDF spadavek...")
     
     # Test základní funkčnosti
     try:
         engine = SpadavkaEngine()
-        print("✅ SpadavkaEngine inicializován")
+        print("OK: SpadavkaEngine inicializovan")
     except Exception as e:
-        print(f"❌ Chyba inicializace engine: {e}")
+        print(f"CHYBA: Chyba inicializace engine: {e}")
         return False
         
     # Test vytvoření dočasné složky
     try:
         temp_dir = tempfile.mkdtemp()
-        print("✅ Dočasná složka vytvořena")
+        print("OK: Docasna slozka vytvorena")
         shutil.rmtree(temp_dir)
     except Exception as e:
-        print(f"❌ Chyba vytvoření dočasné složky: {e}")
+        print(f"CHYBA: Chyba vytvoreni docasne slozky: {e}")
         return False
         
     # Test podpory PDF
     try:
         pdf_supported = engine.is_supported_format("test.pdf")
         if pdf_supported:
-            print("✅ Podpora PDF funkční")
+            print("OK: Podpora PDF funkcni")
         else:
-            print("⚠️ Podpora PDF není implementována")
+            print("INFO: Podpora PDF neni implementovana")
     except Exception as e:
-        print(f"❌ Chyba testování podpory PDF: {e}")
+        print(f"CHYBA: Chyba testovani podpory PDF: {e}")
         return False
         
     # Test PyMuPDF
     try:
         import fitz
-        print("✅ PyMuPDF dostupný")
+        print("OK: PyMuPDF dostupny")
     except ImportError:
-        print("⚠️ PyMuPDF není nainstalován - některé testy budou přeskočeny")
+        print("INFO: PyMuPDF neni nainstalovan - nektere testy budou preskoceny")
         
-    print("✅ Všechny testy PDF spadávek prošly!")
+    print("OK: Vsechny testy PDF spadavek prosly!")
     return True
 
 if __name__ == "__main__":
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     
     # Spuštění unit testů
     if success:
-        print("\n🧪 Spouštím unit testy...")
+        print("\nSpoustim unit testy...")
         unittest.main(argv=[''], exit=False, verbosity=2)
     
-    print("\n✅ Testování PDF spadávek dokončeno!") 
+    print("\nTestovani PDF spadavek dokonceno!") 

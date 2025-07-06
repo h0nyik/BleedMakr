@@ -136,45 +136,45 @@ class TestVectorPDF(unittest.TestCase):
 
 def run_vector_pdf_tests():
     """Spuštění testů vektorových PDF"""
-    print("🧪 Spouštím testy vektorových PDF...")
+    print("Spoustim testy vektorovych PDF...")
     
     # Test základní funkčnosti
     try:
         engine = SpadavkaEngine()
-        print("✅ SpadavkaEngine inicializován")
+        print("OK: SpadavkaEngine inicializovan")
     except Exception as e:
-        print(f"❌ Chyba inicializace engine: {e}")
+        print(f"CHYBA: Chyba inicializace engine: {e}")
         return False
         
     # Test vytvoření dočasné složky
     try:
         temp_dir = tempfile.mkdtemp()
-        print("✅ Dočasná složka vytvořena")
+        print("OK: Docasna slozka vytvorena")
         shutil.rmtree(temp_dir)
     except Exception as e:
-        print(f"❌ Chyba vytvoření dočasné složky: {e}")
+        print(f"CHYBA: Chyba vytvoreni docasne slozky: {e}")
         return False
         
     # Test PyMuPDF pro vektorové PDF
     try:
         import fitz
-        print("✅ PyMuPDF dostupný pro vektorové PDF")
+        print("OK: PyMuPDF dostupny pro vektorove PDF")
     except ImportError:
-        print("⚠️ PyMuPDF není nainstalován - testy vektorových PDF budou omezené")
+        print("INFO: PyMuPDF neni nainstalovan - testy vektorovych PDF budou omezene")
         
     # Test podpory vektorových formátů
     try:
         vector_formats = ['.pdf', '.eps']
         for fmt in vector_formats:
             if engine.is_supported_format(f"test{fmt}"):
-                print(f"✅ Podporován vektorový formát: {fmt}")
+                print(f"OK: Podporovan vektorovy format: {fmt}")
             else:
-                print(f"⚠️ Nepodporován vektorový formát: {fmt}")
+                print(f"INFO: Nepodporovan vektorovy format: {fmt}")
     except Exception as e:
-        print(f"❌ Chyba testování vektorových formátů: {e}")
+        print(f"CHYBA: Chyba testovani vektorovych formatu: {e}")
         return False
         
-    print("✅ Všechny testy vektorových PDF prošly!")
+    print("OK: Vsechny testy vektorovych PDF prosly!")
     return True
 
 if __name__ == "__main__":
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     
     # Spuštění unit testů
     if success:
-        print("\n🧪 Spouštím unit testy...")
+        print("\nSpoustim unit testy...")
         unittest.main(argv=[''], exit=False, verbosity=2)
     
-    print("\n✅ Testování vektorových PDF dokončeno!") 
+    print("\nTestovani vektorovych PDF dokonceno!") 
