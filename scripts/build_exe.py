@@ -19,9 +19,12 @@ def run_command(cmd, description):
         result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
         if result.stdout:
             print(f"   [OK] {result.stdout.strip()}")
+        if result.stderr:
+            print(f"   [WARNING] {result.stderr.strip()}")
         return True
     except subprocess.CalledProcessError as e:
         print(f"   [ERROR] Chyba: {e}")
+        print(f"   Exit code: {e.returncode}")
         if e.stdout:
             print(f"   Stdout: {e.stdout}")
         if e.stderr:
@@ -52,6 +55,11 @@ def create_spec_file():
             data_files.append((f'../{src_path}', dst_path))
         else:
             print(f"[WARNING] Soubor {src_path} nenalezen - vynechavam z buildu")
+    
+    # Kontrola hlavního souboru
+    if not os.path.exists(main_file):
+        print(f"[ERROR] Hlavni soubor {main_file} nenalezen")
+        return False
     
     print(f"[INFO] Nalezene datove soubory: {data_files}")
     
@@ -197,6 +205,9 @@ a = remove_unnecessary_files(a)
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# Detekce GitHub Actions pro vypnuti UPX
+use_upx = os.getenv('GITHUB_ACTIONS') != 'true'
+
 exe = EXE(
     pyz,
     a.scripts,
@@ -208,7 +219,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,  # Komprese UPX
+    upx=use_upx,  # Vypnout UPX na GitHub Actions
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,  # GUI aplikace
@@ -306,9 +317,20 @@ def build_exe():
             shutil.rmtree(dir_name)
             print(f"   Vycisleno: {dir_name}")
     
+    # Kontrola .spec souboru
+    if not os.path.exists('BleedMakr.spec'):
+        print("CHYBA: BleedMakr.spec neexistuje")
+        return False
+    
     # Sestaveni
     cmd = "pyinstaller --clean --noconfirm BleedMakr.spec"
     if not run_command(cmd, "Sestavovani pomoci PyInstaller"):
+        print("CHYBA: PyInstaller selhal")
+        # Diagnostika
+        if os.path.exists('build'):
+            print("   Obsah build/:")
+            for item in os.listdir('build'):
+                print(f"     {item}")
         return False
     
     # Kontrola vysledku
@@ -320,6 +342,23 @@ def build_exe():
         return True
     else:
         print("CHYBA: .exe soubor nebyl vytvoren")
+        
+        # Diagnostika
+        print("   Diagnostika:")
+        if os.path.exists('dist'):
+            print("     Obsah dist/:")
+            for item in os.listdir('dist'):
+                print(f"       {item}")
+        else:
+            print("     Adresar dist/ neexistuje")
+        
+        if os.path.exists('build'):
+            print("     Obsah build/:")
+            for item in os.listdir('build'):
+                print(f"       {item}")
+        else:
+            print("     Adresar build/ neexistuje")
+        
         return False
 
 def create_release_package():

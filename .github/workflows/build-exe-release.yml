@@ -49,12 +49,23 @@ jobs:
         
     - name: Test EXE
       run: |
-        if (Test-Path "dist/BleedMakr.exe") {
+        if (Test-Path "scripts/dist/BleedMakr.exe") {
           Write-Host "[OK] BleedMakr.exe byl úspěšně vytvořen"
-          $size = (Get-Item "dist/BleedMakr.exe").Length / 1MB
+          $size = (Get-Item "scripts/dist/BleedMakr.exe").Length / 1MB
           Write-Host "   Velikost: $([math]::Round($size, 1)) MB"
+          # Zkopíruj .exe do root adresáře pro další kroky
+          New-Item -Path "dist" -ItemType Directory -Force
+          Copy-Item "scripts/dist/BleedMakr.exe" "dist/BleedMakr.exe"
         } else {
           Write-Host "[ERROR] BleedMakr.exe nebyl vytvořen"
+          Write-Host "Obsah scripts/dist/:"
+          if (Test-Path "scripts/dist/") {
+            Get-ChildItem "scripts/dist/" | ForEach-Object { Write-Host "  $_" }
+          } else {
+            Write-Host "  Adresář scripts/dist/ neexistuje"
+          }
+          Write-Host "Obsah scripts/:"
+          Get-ChildItem "scripts/" | ForEach-Object { Write-Host "  $_" }
           exit 1
         }
         
@@ -116,7 +127,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
+        asset_path: ./scripts/BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
         asset_name: BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
         asset_content_type: application/zip
         
