@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Build script pro vytvoření .exe release BleedMakr
-Optimalizováno pro minimální velikost a rychlé spuštění
+Build script pro vytvoreni .exe release BleedMakr
+Optimalizovano pro minimalni velikost a rychle spusteni
 """
 
 import os
@@ -11,9 +11,9 @@ import shutil
 from pathlib import Path
 
 def run_command(cmd, description):
-    """Spustí příkaz a zobrazí výstup"""
+    """Spusti prikaz a zobrazi vystup"""
     print(f"\n[BUILD] {description}")
-    print(f"   Příkaz: {cmd}")
+    print(f"   Prikaz: {cmd}")
     
     try:
         result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
@@ -29,12 +29,12 @@ def run_command(cmd, description):
         return False
 
 def create_spec_file():
-    """Vytvoří optimalizovaný .spec soubor pro PyInstaller"""
+    """Vytvori optimalizovany .spec soubor pro PyInstaller"""
     spec_content = '''# -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
 
-# Explicitní seznam modulů pro optimalizaci
+# Explicitni seznam modulu pro optimalizaci
 hidden_imports = [
     'tkinter',
     'tkinter.ttk',
@@ -57,7 +57,7 @@ hidden_imports = [
     'subprocess'
 ]
 
-# Vynechání nepotřebných modulů
+# Vynechani nepotrebnych modulu
 excludes = [
     'matplotlib',
     'scipy',
@@ -150,10 +150,10 @@ a = Analysis(
     noarchive=False,
 )
 
-# Optimalizace - odstranění nepotřebných souborů
+# Optimalizace - odstraneni nepotrebnych souboru
 def remove_unnecessary_files(a):
-    """Odstraní nepotřebné soubory z analýzy"""
-    # Filtrace binárních souborů
+    """Odstrani nepotrebne soubory z analyzy"""
+    # Filtrace binarnich souboru
     a.binaries = [x for x in a.binaries if not any(
         exclude in x[0].lower() for exclude in [
             'api-ms-win', 'ucrtbase', 'msvcp', 'vcruntime',
@@ -161,7 +161,7 @@ def remove_unnecessary_files(a):
         ]
     )]
     
-    # Filtrace pure modulů
+    # Filtrace pure modulu
     a.pure = [x for x in a.pure if not any(
         exclude in x[0].lower() for exclude in [
             'test', 'tests', 'testing', 'unittest',
@@ -207,7 +207,7 @@ exe = EXE(
     print("OK: Vytvoren optimalizovany .spec soubor")
 
 def create_version_info():
-    """Vytvoří version info soubor pro Windows exe"""
+    """Vytvori version info soubor pro Windows exe"""
     version_info = '''# UTF-8
 #
 # For more details about fixed file info 'ffi' see:
@@ -240,7 +240,7 @@ VSVersionInfo(
       StringTable(
         u'040904B0',
         [StringStruct(u'CompanyName', u'BleedMakr'),
-        StringStruct(u'FileDescription', u'Profesionální generátor spadávek'),
+        StringStruct(u'FileDescription', u'Profesionalni generator spadavky'),
         StringStruct(u'FileVersion', u'0.0.1'),
         StringStruct(u'InternalName', u'BleedMakr'),
         StringStruct(u'LegalCopyright', u'© 2025 BleedMakr. AGPL-3.0 License'),
@@ -259,7 +259,7 @@ VSVersionInfo(
     print("OK: Vytvoren version info soubor")
 
 def install_dependencies():
-    """Nainstaluje PyInstaller a další závislosti"""
+    """Nainstaluje PyInstaller a dalsi zavislosti"""
     print("Instalace PyInstaller a UPX...")
     
     # Instalace PyInstaller
@@ -276,21 +276,21 @@ def install_dependencies():
     return True
 
 def build_exe():
-    """Sestaví .exe soubor"""
+    """Sestavi .exe soubor"""
     print("\nSestavovani .exe souboru...")
     
-    # Vyčištění předchozích buildů
+    # Vycisleni predchozich buildu
     for dir_name in ['build', 'dist', '__pycache__']:
         if os.path.exists(dir_name):
             shutil.rmtree(dir_name)
-            print(f"   Vyčištěno: {dir_name}")
+            print(f"   Vycisleno: {dir_name}")
     
-    # Sestavení
+    # Sestaveni
     cmd = "pyinstaller --clean --noconfirm BleedMakr.spec"
-    if not run_command(cmd, "Sestavování pomocí PyInstaller"):
+    if not run_command(cmd, "Sestavovani pomoci PyInstaller"):
         return False
     
-    # Kontrola výsledku
+    # Kontrola vysledku
     exe_path = Path("dist/BleedMakr.exe")
     if exe_path.exists():
         size_mb = exe_path.stat().st_size / (1024 * 1024)
@@ -302,7 +302,7 @@ def build_exe():
         return False
 
 def create_release_package():
-    """Vytvoří balíček pro release"""
+    """Vytvori balicek pro release"""
     print("\nVytvareni release balicku...")
     
     release_dir = Path("release")
@@ -311,7 +311,7 @@ def create_release_package():
     
     release_dir.mkdir()
     
-    # Kopírování souborů
+    # Kopirovani souboru
     files_to_copy = [
         ("dist/BleedMakr.exe", "BleedMakr.exe"),
         ("../docs/README.md", "README.md"),
@@ -322,9 +322,9 @@ def create_release_package():
     for src, dst in files_to_copy:
         if os.path.exists(src):
             shutil.copy2(src, release_dir / dst)
-            print(f"   Zkopírováno: {src} -> {dst}")
+            print(f"   Zkopirovano: {src} -> {dst}")
     
-    # Vytvoření ZIP archivu
+    # Vytvoreni ZIP archivu
     zip_name = "BleedMakr-v0.0.1-Windows-x64"
     shutil.make_archive(zip_name, 'zip', release_dir)
     print(f"OK: Vytvoren release balicek: {zip_name}.zip")
@@ -332,7 +332,7 @@ def create_release_package():
     return f"{zip_name}.zip"
 
 def main():
-    """Hlavní funkce build procesu"""
+    """Hlavni funkce build procesu"""
     print("BleedMakr - Build .exe release")
     print("=" * 50)
     
@@ -343,19 +343,19 @@ def main():
     
     print(f"OK: Python {sys.version}")
     
-    # Instalace závislostí
+    # Instalace zavislosti
     if not install_dependencies():
         return False
     
-    # Vytvoření konfiguračních souborů
+    # Vytvoreni konfiguracnich souboru
     create_spec_file()
     create_version_info()
     
-    # Sestavení .exe
+    # Sestaveni .exe
     if not build_exe():
         return False
     
-    # Vytvoření release balíčku
+    # Vytvoreni release balicku
     zip_file = create_release_package()
     
     print("\nBuild dokoncen uspesne!")
