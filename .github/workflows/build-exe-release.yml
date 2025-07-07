@@ -2,6 +2,7 @@ name: Build EXE Release
 
 on:
   push:
+    branches: [ master ]  # Spustí se při každém push do masteru
     tags:
       - 'v*'  # Spustí se při push tag začínajícího v (např. v0.0.1)
   workflow_dispatch:  # Umožní manuální spuštění
@@ -25,6 +26,13 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
         
+    - name: Run tests
+      run: |
+        python tests/test_app.py
+        python tests/test_white_borders.py
+        python tests/test_pdf_bleed.py
+        python tests/test_vector_pdf.py
+        
     - name: Download UPX
       run: |
         Invoke-WebRequest -Uri "https://github.com/upx/upx/releases/download/v4.2.2/upx-4.2.2-win64.zip" -OutFile "upx.zip"
@@ -46,12 +54,6 @@ jobs:
           Write-Host "[ERROR] BleedMakr.exe nebyl vytvořen"
           exit 1
         }
-    - name: Run tests
-      run: |
-        python tests/test_app.py
-        python tests/test_white_borders.py
-        python tests/test_pdf_bleed.py
-        python tests/test_vector_pdf.py
         
     - name: Get version
       id: version
