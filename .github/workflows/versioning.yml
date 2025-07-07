@@ -14,28 +14,29 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Semantic Version
-        id: version
-        uses: paulhatch/semantic-version@v5.4.0
-        with:
-          major_pattern: "(MAJOR)"
-          minor_pattern: "(MINOR)"
-          version_format: "${major}.${minor}.${patch}"
-          bump_each_commit: true
-      
-      - name: Create Tag
-        run: git tag v${{ steps.version.outputs.version }}
-      
-      - name: Push Tags
-        run: git push origin --tags
-      
-      - name: Update version.txt
-        run: echo "${{ steps.version.outputs.version }}" > version.txt
-      
-      - name: Commit version update
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add version.txt
-          git commit -m "chore: update version to ${{ steps.version.outputs.version }}" || exit 0
-          git push 
+      # POZASTAVENO: Automatické verzování a tagování je dočasně vypnuto
+      # - name: Semantic Version
+      #   id: version
+      #   uses: paulhatch/semantic-version@v5.4.0
+      #   with:
+      #     major_pattern: "(MAJOR)"
+      #     minor_pattern: "(MINOR)"
+      #     version_format: "${major}.${minor}.${patch}"
+      #     bump_each_commit: true
+      #
+      # - name: Create Tag
+      #   run: git tag v${{ steps.version.outputs.version }}
+      #
+      # - name: Push Tags
+      #   run: git push origin --tags
+      #
+      # - name: Update version.txt
+      #   run: echo "${{ steps.version.outputs.version }}" > version.txt
+      #
+      # - name: Commit version update
+      #   run: |
+      #     git config --local user.email "action@github.com"
+      #     git config --local user.name "GitHub Action"
+      #     git add version.txt
+      #     git commit -m "chore: update version to ${{ steps.version.outputs.version }}" || exit 0
+      #     git push 
