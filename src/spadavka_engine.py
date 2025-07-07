@@ -17,6 +17,20 @@ class SpadavkaEngine:
         self.inner_bleed_px = int(inner_bleed_mm * 11.811)
         self.extra_crop_px = extra_crop_px
         
+    def is_supported_format(self, file_path):
+        """Kontroluje, zda je formát souboru podporován"""
+        supported_extensions = ['.pdf', '.eps', '.tiff', '.tif', '.jpg', '.jpeg', '.png']
+        file_ext = os.path.splitext(file_path)[1].lower()
+        return file_ext in supported_extensions
+        
+    def validate_bleed_size(self, size_mm):
+        """Validuje velikost spadávky"""
+        return 0 < size_mm <= 50  # Maximálně 50mm spadávka
+        
+    def detect_white_borders(self, img, tolerance=10):
+        """Detekuje bílé okraje v obrázku - alias pro _detect_white_borders"""
+        return self._detect_white_borders(img, tolerance)
+        
     def generate_spadavka(self, input_path, output_path):
         """Generuje spadávku z vstupního souboru"""
         if not os.path.exists(input_path):

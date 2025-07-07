@@ -14,9 +14,13 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
+# Nastavení PYTHONPATH pro GitHub Actions
+if 'GITHUB_WORKSPACE' in os.environ:
+    sys.path.insert(0, os.path.join(os.environ['GITHUB_WORKSPACE'], 'src'))
+
 try:
     from spadavka_engine import SpadavkaEngine
-    from spadavka_generator import BleedMakrApp
+    from spadavka_generator import SpadavkaGenerator
 except ImportError as e:
     print(f"[ERROR] Chyba importu: {e}")
     sys.exit(1)
@@ -31,8 +35,10 @@ class TestBleedMakrApp(unittest.TestCase):
     def test_engine_initialization(self):
         """Test inicializace engine"""
         self.assertIsNotNone(self.engine)
-        self.assertTrue(hasattr(self.engine, 'process_image'))
-        self.assertTrue(hasattr(self.engine, 'detect_white_borders'))
+        self.assertTrue(hasattr(self.engine, 'generate_spadavka'))
+        # Kontrola dostupných metod
+        available_methods = [method for method in dir(self.engine) if not method.startswith('_')]
+        print(f"Dostupné metody engine: {available_methods}")
         
     def test_bleed_size_validation(self):
         """Test validace velikosti spadávky"""

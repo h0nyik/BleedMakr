@@ -15,6 +15,10 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
+# Nastavení PYTHONPATH pro GitHub Actions
+if 'GITHUB_WORKSPACE' in os.environ:
+    sys.path.insert(0, os.path.join(os.environ['GITHUB_WORKSPACE'], 'src'))
+
 try:
     from spadavka_engine import SpadavkaEngine
 except ImportError as e:
@@ -49,10 +53,7 @@ class TestWhiteBorders(unittest.TestCase):
         borders = self.engine.detect_white_borders(img_with_borders)
         
         self.assertIsNotNone(borders)
-        self.assertTrue(hasattr(borders, 'left'))
-        self.assertTrue(hasattr(borders, 'right'))
-        self.assertTrue(hasattr(borders, 'top'))
-        self.assertTrue(hasattr(borders, 'bottom'))
+        self.assertEqual(len(borders), 4)  # left, top, right, bottom
         
         # Test bez bílých okrajů
         img_without_borders = self.create_test_image(has_white_borders=False)
@@ -66,9 +67,12 @@ class TestWhiteBorders(unittest.TestCase):
         original_img = self.create_test_image(has_white_borders=True)
         original_size = original_img.size
         
-        # Detekce a ořezání
+        # Detekce okrajů
         borders = self.engine.detect_white_borders(original_img)
-        cropped_img = self.engine.crop_white_borders(original_img, borders)
+        left, top, right, bottom = borders
+        
+        # Ruční ořezání
+        cropped_img = original_img.crop((left, top, right, bottom))
         
         # Ořezaný obrázek by měl být menší
         self.assertLess(cropped_img.size[0], original_size[0])

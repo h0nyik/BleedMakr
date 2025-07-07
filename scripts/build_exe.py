@@ -30,7 +30,12 @@ def run_command(cmd, description):
 
 def create_spec_file():
     """Vytvori optimalizovany .spec soubor pro PyInstaller"""
-    spec_content = '''# -*- mode: python ; coding: utf-8 -*-
+    # Určení správné cesty k hlavnímu souboru
+    main_file = 'src/spadavka_generator.py'
+    if not os.path.exists(main_file):
+        main_file = '../src/spadavka_generator.py'
+    
+    spec_content = f'''# -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
 
@@ -131,17 +136,17 @@ excludes = [
 ]
 
 a = Analysis(
-    ['../src/spadavka_generator.py'],
-    pathex=['../src'],
+    ['{main_file}'],
+    pathex=['src', '../src'],
     binaries=[],
     datas=[
-        ('../docs/README.md', '.'),
-        ('../LICENSE', '.'),
-        ('../version.txt', '.')
+        ('docs/README.md', '.'),
+        ('LICENSE', '.'),
+        ('version.txt', '.')
     ],
     hiddenimports=hidden_imports,
     hookspath=[],
-    hooksconfig={},
+    hooksconfig={{}},
     runtime_hooks=[],
     excludes=excludes,
     win_no_prefer_redirects=False,
@@ -314,9 +319,9 @@ def create_release_package():
     # Kopirovani souboru
     files_to_copy = [
         ("dist/BleedMakr.exe", "BleedMakr.exe"),
-        ("../docs/README.md", "README.md"),
-        ("../LICENSE", "LICENSE"),
-        ("../version.txt", "version.txt")
+        ("docs/README.md", "README.md"),
+        ("LICENSE", "LICENSE"),
+        ("version.txt", "version.txt")
     ]
     
     for src, dst in files_to_copy:
@@ -342,6 +347,17 @@ def main():
         return False
     
     print(f"OK: Python {sys.version}")
+    
+    # Kontrola, zda jsme ve správné složce
+    src_path = '../src/spadavka_generator.py'
+    if not os.path.exists(src_path):
+        # Zkusíme alternativní cestu pro GitHub Actions
+        src_path = 'src/spadavka_generator.py'
+        if not os.path.exists(src_path):
+            print("CHYBA: SpadavkaGenerator.py nenalezen")
+            print("   Aktualni cesta:", os.getcwd())
+            print("   Hledane cesty: ../src/spadavka_generator.py, src/spadavka_generator.py")
+            return False
     
     # Instalace zavislosti
     if not install_dependencies():

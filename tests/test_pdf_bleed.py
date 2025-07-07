@@ -17,6 +17,10 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
+# Nastavení PYTHONPATH pro GitHub Actions
+if 'GITHUB_WORKSPACE' in os.environ:
+    sys.path.insert(0, os.path.join(os.environ['GITHUB_WORKSPACE'], 'src'))
+
 try:
     from spadavka_engine import SpadavkaEngine
 except ImportError as e:
@@ -92,7 +96,8 @@ class TestPDFBleed(unittest.TestCase):
         
         # Test generování spadávky
         try:
-            result = self.engine.process_image(img_path, bleed_size=3)
+            output_path = os.path.join(self.temp_dir, "output.pdf")
+            result, info = self.engine.generate_spadavka(img_path, output_path)
             self.assertIsNotNone(result)
         except Exception as e:
             print(f"[WARNING] Generování spadávky selhalo: {e}")
@@ -106,9 +111,10 @@ class TestPDFBleed(unittest.TestCase):
         
         # Test, že výstup je vždy PDF
         try:
-            result = self.engine.process_image(img_path, bleed_size=3)
-            if result and os.path.exists(result):
-                self.assertTrue(result.endswith('.pdf'))
+            output_path = os.path.join(self.temp_dir, "output.pdf")
+            result, info = self.engine.generate_spadavka(img_path, output_path)
+            if result and os.path.exists(output_path):
+                self.assertTrue(output_path.endswith('.pdf'))
         except Exception as e:
             print(f"[WARNING] Test výstupního formátu selhal: {e}")
             

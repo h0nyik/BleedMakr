@@ -27,6 +27,8 @@ jobs:
         pip install pyinstaller
         
     - name: Run tests
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
       run: |
         python tests/test_app.py
         python tests/test_white_borders.py
@@ -41,8 +43,9 @@ jobs:
         echo "$PWD" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         
     - name: Build EXE
+      working-directory: scripts
       run: |
-        python scripts/build_exe.py
+        python build_exe.py
         
     - name: Test EXE
       run: |

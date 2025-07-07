@@ -16,6 +16,10 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
+# Nastavení PYTHONPATH pro GitHub Actions
+if 'GITHUB_WORKSPACE' in os.environ:
+    sys.path.insert(0, os.path.join(os.environ['GITHUB_WORKSPACE'], 'src'))
+
 try:
     from spadavka_engine import SpadavkaEngine
 except ImportError as e:
