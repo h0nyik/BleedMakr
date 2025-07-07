@@ -49,7 +49,11 @@ class TestVectorPDF(unittest.TestCase):
             
             # Vektorový červený kruh
             circle_rect = fitz.Rect(200, 200, 400, 400)
-            page.draw_circle(circle_rect.center, 50, color=(1, 0, 0), fill=(1, 0, 0))
+            # Vypočítání středu ručně (center už neexistuje v nových verzích PyMuPDF)
+            center_x = (circle_rect.x0 + circle_rect.x1) / 2
+            center_y = (circle_rect.y0 + circle_rect.y1) / 2
+            center_point = fitz.Point(center_x, center_y)
+            page.draw_circle(center_point, 50, color=(1, 0, 0), fill=(1, 0, 0))
             
             # Vektorová modrá čára
             page.draw_line(fitz.Point(100, 100), fitz.Point(300, 300), color=(0, 0, 1), width=5)
@@ -92,7 +96,7 @@ class TestVectorPDF(unittest.TestCase):
                 result = self.engine.process_pdf(pdf_path, bleed_size=3)
                 self.assertIsNotNone(result)
         except Exception as e:
-            print(f"[WARNING] Zpracování vektorového PDF selhalo: {e}")
+            print(f"[WARNING] Zpracovani vektoroveho PDF selhalo: {e}")
             
     def test_vector_quality_preservation(self):
         """Test zachování vektorové kvality"""
@@ -110,7 +114,7 @@ class TestVectorPDF(unittest.TestCase):
                 self.assertGreater(width, 1000)  # Vysoké rozlišení
                 self.assertGreater(height, 1000)
         except Exception as e:
-            print(f"[WARNING] Test zachování kvality selhal: {e}")
+            print(f"[WARNING] Test zachovani kvality selhal: {e}")
             
     def test_vector_elements_detection(self):
         """Test detekce vektorových prvků"""
@@ -122,7 +126,7 @@ class TestVectorPDF(unittest.TestCase):
                 analysis = self.engine.analyze_pdf_content(pdf_path)
                 self.assertIsNotNone(analysis)
         except Exception as e:
-            print(f"[WARNING] Analýza vektorových prvků selhala: {e}")
+            print(f"[WARNING] Analyza vektorovych prvku selhala: {e}")
             
     def test_vector_to_raster_conversion(self):
         """Test konverze vektorového PDF na rastr"""
@@ -137,7 +141,7 @@ class TestVectorPDF(unittest.TestCase):
                     self.assertIsNotNone(img)
                     self.assertTrue(isinstance(img, Image.Image))
         except Exception as e:
-            print(f"[WARNING] Konverze vektorového PDF selhala: {e}")
+            print(f"[WARNING] Konverze vektoroveho PDF selhala: {e}")
 
 def run_vector_pdf_tests():
     """Spuštění testů vektorových PDF"""

@@ -85,7 +85,7 @@ class TestPDFBleed(unittest.TestCase):
                 self.assertTrue(isinstance(img, Image.Image))
         except Exception as e:
             # Pokud konverze selže, test stále projde
-            print(f"[WARNING] Konverze PDF na obrázek selhala: {e}")
+            print(f"[WARNING] Konverze PDF na obrazek selhala: {e}")
             
     def test_bleed_generation(self):
         """Test generování spadávky"""
@@ -100,7 +100,7 @@ class TestPDFBleed(unittest.TestCase):
             result, info = self.engine.generate_spadavka(img_path, output_path)
             self.assertIsNotNone(result)
         except Exception as e:
-            print(f"[WARNING] Generování spadávky selhalo: {e}")
+            print(f"[WARNING] Generovani spadavky selhalo: {e}")
             
     def test_output_format(self):
         """Test výstupního formátu"""
@@ -116,7 +116,7 @@ class TestPDFBleed(unittest.TestCase):
             if result and os.path.exists(output_path):
                 self.assertTrue(output_path.endswith('.pdf'))
         except Exception as e:
-            print(f"[WARNING] Test výstupního formátu selhal: {e}")
+            print(f"[WARNING] Test vystupniho formatu selhal: {e}")
             
     def test_bleed_size_validation(self):
         """Test validace velikosti spadávky"""

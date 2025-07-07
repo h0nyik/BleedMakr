@@ -35,6 +35,26 @@ def create_spec_file():
     if not os.path.exists(main_file):
         main_file = '../src/spadavka_generator.py'
     
+    # Dynamické určení cest k datovým souborům
+    data_files = []
+    
+    # Testování různých možných cest
+    possible_paths = [
+        ('docs/README.md', '.'),
+        ('LICENSE', '.'),
+        ('version.txt', '.')
+    ]
+    
+    for src_path, dst_path in possible_paths:
+        if os.path.exists(src_path):
+            data_files.append((src_path, dst_path))
+        elif os.path.exists(f'../{src_path}'):
+            data_files.append((f'../{src_path}', dst_path))
+        else:
+            print(f"[WARNING] Soubor {src_path} nenalezen - vynechavam z buildu")
+    
+    print(f"[INFO] Nalezene datove soubory: {data_files}")
+    
     spec_content = f'''# -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
@@ -139,11 +159,7 @@ a = Analysis(
     ['{main_file}'],
     pathex=['src', '../src'],
     binaries=[],
-    datas=[
-        ('docs/README.md', '.'),
-        ('LICENSE', '.'),
-        ('version.txt', '.')
-    ],
+    datas={data_files},
     hiddenimports=hidden_imports,
     hookspath=[],
     hooksconfig={{}},

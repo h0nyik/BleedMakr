@@ -326,4 +326,13 @@ __pycache__/
 *.bak
 *.tmp
 .venv/
-version_info.txt 
+version_info.txt
+
+# PyInstaller build specifics
+scripts/build/
+scripts/dist/
+scripts/release/
+scripts/*.spec
+scripts/version_info.txt
+scripts/*.zip
+scripts/*.exe 

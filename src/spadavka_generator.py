@@ -5,7 +5,7 @@ def install_and_import(package, pip_name=None):
     try:
         __import__(package)
     except ImportError:
-        print(f"Instaluji chybějící balíček: {package}")
+        print(f"Instaluji chybejici balicek: {package}")
         subprocess.check_call([sys.executable, "-m", "pip", "install", pip_name or package])
         __import__(package)
 

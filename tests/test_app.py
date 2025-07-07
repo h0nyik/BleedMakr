@@ -38,7 +38,7 @@ class TestBleedMakrApp(unittest.TestCase):
         self.assertTrue(hasattr(self.engine, 'generate_spadavka'))
         # Kontrola dostupných metod
         available_methods = [method for method in dir(self.engine) if not method.startswith('_')]
-        print(f"Dostupné metody engine: {available_methods}")
+        print(f"Dostupne metody engine: {available_methods}")
         
     def test_bleed_size_validation(self):
         """Test validace velikosti spadávky"""
