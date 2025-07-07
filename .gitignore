@@ -171,6 +171,11 @@ cython_debug/
 
 # Cursor
 .cursor/
+.cursorrules
+.cursorrules.manual
+.cursorrules.backup
+switch_versioning.bat
+VERSIONING.md
 
 # Sublime Text
 *.sublime-workspace

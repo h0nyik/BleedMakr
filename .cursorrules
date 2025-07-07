@@ -4,6 +4,29 @@
 
 Před každým commit a push na GitHub MUSÍŠ zkontrolovat a případně upravit verzi podle těchto pravidel:
 
+## Struktura a přehlednost projektu
+
+### Pravidla pro organizaci souborů a složek:
+- **src/** - Hlavní zdrojový kód aplikace
+- **tests/** - Testovací soubory (odpovídají struktuře src/)
+- **docs/** - Dokumentace a README soubory
+- **scripts/** - Build skripty a utility
+- **logs/** - Log soubory (ignorovány v git)
+- **.github/** - GitHub Actions a konfigurace
+
+### Pravidla pro názvy souborů:
+- Používej snake_case pro Python soubory (např. `spadavka_generator.py`)
+- Používej kebab-case pro konfigurační soubory (např. `build-exe-release.yml`)
+- Používej PascalCase pro třídy v kódu
+- Používej camelCase pro proměnné a funkce
+
+### Pravidla pro organizaci kódu:
+- Každá třída v samostatném souboru nebo logicky seskupené
+- Importy na začátku souboru, seřazené podle standardu
+- Komentáře v češtině pro business logiku
+- Docstringy pro všechny veřejné funkce a třídy
+- Maximální délka řádku 120 znaků
+
 ### Formát verze: MAJOR.MINOR.PATCH
 - **MAJOR** - Nezpětně kompatibilní změny API
 - **MINOR** - Zpětně kompatibilní nové funkce  
@@ -46,14 +69,20 @@ fix: oprava chyby při zpracování PDF (PATCH)
 BREAKING CHANGE: změněno API pro zpracování (MAJOR)
 ```
 
+### Pravidla pro commit messages:
+- Používej konvenční commit formát (feat:, fix:, docs:, style:, refactor:, test:, chore:)
+- První řádek max 50 znaků
+- Popis změny v češtině
+- Pokud je potřeba detailnější popis, použij prázdný řádek a pokračuj
+- Vždy uveď typ změny (MAJOR/MINOR/PATCH) v závorce
+
 ### Automatické akce před push:
 1. Zkontroluj změny v kódu
 2. Urči typ změny (MAJOR/MINOR/PATCH)
-3. Uprav version.txt
-4. Aktualizuj README.md badge
-5. Commit s popisným message
-6. Push na GitHub
-7. Vytvoř Git tag
+3. **POZOR: Verze se NEMĚNÍ automaticky - čekáme na vyřešení problémů s buildy**
+4. Commit s popisným message (bez změny verze)
+5. Push na GitHub
+6. **Git tag se vytváří pouze po osobním pokynu**
 
 ### Soubor version.txt:
 Vytvoř soubor `version.txt` s obsahem:
@@ -61,13 +90,13 @@ Vytvoř soubor `version.txt` s obsahem:
 0.0.1
 ```
 
-### Příklad workflow:
+### Příklad workflow (POZASTAVENO):
 1. Udělal jsem změny → analyzuj typ
-2. Typ: oprava chyby → PATCH (0.0.1 → 0.0.2)
-3. Uprav version.txt na "0.0.2"
-4. Commit: "fix: oprava chyby při zpracování EPS souborů"
+2. Typ: oprava chyby → PATCH (0.0.1 → 0.0.2) **ALE NEZVEŠŤUJEME**
+3. **Verze zůstává 0.0.1 - čekáme na vyřešení buildů**
+4. Commit: "fix: oprava chyby při zpracování EPS souborů (verze zůstává 0.0.1)"
 5. Push
-6. Git tag v0.0.2 (příklad pro budoucí verze)
+6. **Git tag se vytváří pouze po osobním pokynu**
 
 ### GitHub Actions pro automatické tagování:
 Přidej do .github/workflows/versioning.yml:
@@ -93,17 +122,29 @@ jobs:
 ```
 
 ### Důležité poznámky:
+- **POZASTAVENO: Verze zůstává 0.0.1 až do vyřešení problémů s buildy**
 - Začínáme s verzí 0.0.1 protože jsme v úplně počáteční fázi vývoje
 - Verze 0.1.0 bude až když bude základní API definované
 - Verze 1.0.0 bude až když bude API stabilní a připravené pro produkci
 - Každá změna MUSÍ být commitována s popisným message
-- Tagy se vytvářejí pouze pro stabilní verze
+- **Tagy se vytvářejí pouze po osobním pokynu**
 - Pre-release verze používají suffix (např. 0.0.1-alpha.1)
 - Build metadata se přidává za + (např. 0.0.1+build.123)
 
+### Pravidla pro refaktoring a údržbu:
+- Pravidelně refaktoruj kód pro lepší čitelnost
+- Odstraňuj duplicitní kód
+- Dodržuj princip DRY (Don't Repeat Yourself)
+- Používej meaningful názvy proměnných a funkcí
+- Komentuj složitou business logiku
+- Udržuj testy aktuální s kódem
+
 ### Kontrolní seznam před každým push:
 - [ ] Určil jsem správný typ změny
-- [ ] Upravil jsem version.txt
-- [ ] Aktualizoval jsem README.md badge
-- [ ] Commit message je popisný
-- [ ] Vytvořím Git tag po push 
+- [ ] **POZOR: Verze zůstává 0.0.1 - čekáme na vyřešení buildů**
+- [ ] Commit message je popisný (bez změny verze)
+- [ ] **Git tag se vytváří pouze po osobním pokynu**
+- [ ] Kód je přehledně strukturovaný
+- [ ] Názvy souborů a složek odpovídají konvencím
+- [ ] Testy procházejí (pokud existují)
+- [ ] Dokumentace je aktualizována (pokud je potřeba) 
