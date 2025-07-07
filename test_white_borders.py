@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     from spadavka_engine import SpadavkaEngine
 except ImportError as e:
-    print(f"❌ Chyba importu: {e}")
+    print(f"[ERROR] Chyba importu: {e}")
     sys.exit(1)
 
 class TestWhiteBorders(unittest.TestCase):

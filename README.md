@@ -1,4 +1,4 @@
-# BleedMakr 🎨
+# BleedMakr
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-AGPL%203.0-green.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -12,15 +12,15 @@ BleedMakr je nástroj pro automatické generování spadávek (bleed) pro tiskov
 
 ## 🚀 Funkce
 
-- ✅ **Automatická detekce a generování spadávky**
-- ✅ **Zachování vektorového středu PDF**
-- ✅ **Inteligentní bitmapové okraje** s plynulým přechodem (soft fade)
-- ✅ **Podpora formátů**: PDF, EPS, TIFF, JPG, PNG
-- ✅ **Moderní GUI** včetně náhledu a logu operací
-- ✅ **Inteligentní detekce bílých okrajů** - automatické ořezání
-- ✅ **Adaptivní zrcadlení** - roztažení místo zrcadlení pro bílé okraje
-- ✅ **Batch zpracování** více souborů
-- ✅ **Export do PDF** s vysokým rozlišením (300 DPI)
+- [OK] **Automatická detekce a generování spadávky**
+- [OK] **Zachování vektorového středu PDF**
+- [OK] **Inteligentní bitmapové okraje** s plynulým přechodem (soft fade)
+- [OK] **Podpora formátů**: PDF, EPS, TIFF, JPG, PNG
+- [OK] **Moderní GUI** včetně náhledu a logu operací
+- [OK] **Inteligentní detekce bílých okrajů** - automatické ořezání
+- [OK] **Adaptivní zrcadlení** - roztažení místo zrcadlení pro bílé okraje
+- [OK] **Batch zpracování** více souborů
+- [OK] **Export do PDF** s vysokým rozlišením (300 DPI)
 
 ## 📋 Požadavky
 
@@ -183,4 +183,4 @@ Pokud vám tento projekt pomohl, dejte mu hvězdičku na GitHubu! ⭐
 
 ---
 
-**BleedMakr** - Profesionální řešení pro generování spadávek v reklamních agenturách 🎨 
+**BleedMakr** - Profesionální řešení pro generování spadávek v reklamních agenturách 

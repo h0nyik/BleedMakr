@@ -67,7 +67,7 @@ Vytvoř soubor `version.txt` s obsahem:
 3. Uprav version.txt na "0.0.2"
 4. Commit: "fix: oprava chyby při zpracování EPS souborů"
 5. Push
-6. Git tag v0.0.2
+6. Git tag v0.0.2 (příklad pro budoucí verze)
 
 ### GitHub Actions pro automatické tagování:
 Přidej do .github/workflows/versioning.yml:

@@ -12,16 +12,16 @@ from pathlib import Path
 
 def run_command(cmd, description):
     """Spustí příkaz a zobrazí výstup"""
-    print(f"\n🔧 {description}")
+    print(f"\n[BUILD] {description}")
     print(f"   Příkaz: {cmd}")
     
     try:
         result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
         if result.stdout:
-            print(f"   ✅ {result.stdout.strip()}")
+            print(f"   [OK] {result.stdout.strip()}")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"   ❌ Chyba: {e}")
+        print(f"   [ERROR] Chyba: {e}")
         if e.stdout:
             print(f"   Stdout: {e.stdout}")
         if e.stderr:

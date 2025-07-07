@@ -1,17 +1,17 @@
 # BleedMakr v0.0.1 - První Release
 
-## 🎨 Profesionální generátor spadávek pro reklamní agentury
+## Profesionální generátor spadávek pro reklamní agentury
 
 ### ✨ Hlavní funkce:
 
-- ✅ **Perfektní napojení spadávky** - Color matching algoritmus pro 100% shodu barev
-- ✅ **Zachování vektorové kvality** - PDF střed zůstává vektorový
-- ✅ **Inteligentní detekce okrajů** - Automatické ořezání bílých okrajů
-- ✅ **Moderní GUI** - Drag&drop podpora, náhledy, progress bar
-- ✅ **Podpora formátů**: PDF, EPS, PNG, JPG, TIFF
-- ✅ **Batch zpracování** - Více souborů najednou
-- ✅ **Export do PDF** - Vysoké rozlišení (300 DPI)
-- ✅ **Diagnostika** - Detailní log operací a kontrola napojení
+- [OK] **Perfektní napojení spadávky** - Color matching algoritmus pro 100% shodu barev
+- [OK] **Zachování vektorové kvality** - PDF střed zůstává vektorový
+- [OK] **Inteligentní detekce okrajů** - Automatické ořezání bílých okrajů
+- [OK] **Moderní GUI** - Drag&drop podpora, náhledy, progress bar
+- [OK] **Podpora formátů**: PDF, EPS, PNG, JPG, TIFF
+- [OK] **Batch zpracování** - Více souborů najednou
+- [OK] **Export do PDF** - Vysoké rozlišení (300 DPI)
+- [OK] **Diagnostika** - Detailní log operací a kontrola napojení
 
 ### 🔧 Technické vylepšení:
 
@@ -60,7 +60,7 @@
 - EPS soubory vyžadují Ghostscript pro správné zpracování
 - Velmi složité PDF s transparentnostmi mohou mít drobné odchylky
 
-### 📈 Plánované vylepšení (v0.0.2):
+### 📈 Plánované vylepšení (budoucí verze):
 
 - [ ] Podpora CMYK barevného prostoru
 - [ ] Automatická detekce ořezových značek

@@ -39,11 +39,11 @@ jobs:
     - name: Test EXE
       run: |
         if (Test-Path "dist/BleedMakr.exe") {
-          Write-Host "✅ BleedMakr.exe byl úspěšně vytvořen"
+          Write-Host "[OK] BleedMakr.exe byl úspěšně vytvořen"
           $size = (Get-Item "dist/BleedMakr.exe").Length / 1MB
           Write-Host "   Velikost: $([math]::Round($size, 1)) MB"
         } else {
-          Write-Host "❌ BleedMakr.exe nebyl vytvořen"
+          Write-Host "[ERROR] BleedMakr.exe nebyl vytvořen"
           exit 1
         }
         
@@ -65,29 +65,29 @@ jobs:
         body: |
           # BleedMakr v${{ steps.version.outputs.VERSION }}
           
-          ## 🎨 Profesionální generátor spadávek pro reklamní agentury
+          ## Profesionální generátor spadávek pro reklamní agentury
           
-          ### ✨ Funkce:
-          - ✅ **Perfektní napojení spadávky** s color matching algoritmem
-          - ✅ **Zachování vektorové kvality** PDF
-          - ✅ **Inteligentní detekce okrajů** s automatickým ořezáním
-          - ✅ **Moderní GUI** s drag&drop podporou
-          - ✅ **Podpora formátů**: PDF, EPS, PNG, JPG, TIFF
-          - ✅ **Batch zpracování** více souborů
-          - ✅ **Export do PDF** s vysokým rozlišením (300 DPI)
+          ### Funkce:
+          - [OK] **Perfektní napojení spadávky** s color matching algoritmem
+          - [OK] **Zachování vektorové kvality** PDF
+          - [OK] **Inteligentní detekce okrajů** s automatickým ořezáním
+          - [OK] **Moderní GUI** s drag&drop podporou
+          - [OK] **Podpora formátů**: PDF, EPS, PNG, JPG, TIFF
+          - [OK] **Batch zpracování** více souborů
+          - [OK] **Export do PDF** s vysokým rozlišením (300 DPI)
           
-          ### 📋 Požadavky:
+          ### Požadavky:
           - **Windows 10/11** (64-bit)
           - **Minimálně 4GB RAM**
           - **500MB volného místa**
           - **Ghostscript** (pro EPS soubory) - volitelné
           
-          ### 🚀 Instalace:
+          ### Instalace:
           1. Stáhněte `BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip`
           2. Rozbalte do libovolné složky
           3. Spusťte `BleedMakr.exe`
           
-          ### 🔧 Použití:
+          ### Použití:
           1. Přetáhněte soubory do aplikace nebo klikněte "Přidat soubory"
           2. Nastavte velikost spadávky (výchozí: 3 mm)
           3. Vyberte výstupní složku

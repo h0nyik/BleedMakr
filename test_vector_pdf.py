@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     from spadavka_engine import SpadavkaEngine
 except ImportError as e:
-    print(f"❌ Chyba importu: {e}")
+    print(f"[ERROR] Chyba importu: {e}")
     sys.exit(1)
 
 class TestVectorPDF(unittest.TestCase):
@@ -87,7 +87,7 @@ class TestVectorPDF(unittest.TestCase):
                 result = self.engine.process_pdf(pdf_path, bleed_size=3)
                 self.assertIsNotNone(result)
         except Exception as e:
-            print(f"⚠️ Zpracování vektorového PDF selhalo: {e}")
+            print(f"[WARNING] Zpracování vektorového PDF selhalo: {e}")
             
     def test_vector_quality_preservation(self):
         """Test zachování vektorové kvality"""
@@ -105,7 +105,7 @@ class TestVectorPDF(unittest.TestCase):
                 self.assertGreater(width, 1000)  # Vysoké rozlišení
                 self.assertGreater(height, 1000)
         except Exception as e:
-            print(f"⚠️ Test zachování kvality selhal: {e}")
+            print(f"[WARNING] Test zachování kvality selhal: {e}")
             
     def test_vector_elements_detection(self):
         """Test detekce vektorových prvků"""
@@ -117,7 +117,7 @@ class TestVectorPDF(unittest.TestCase):
                 analysis = self.engine.analyze_pdf_content(pdf_path)
                 self.assertIsNotNone(analysis)
         except Exception as e:
-            print(f"⚠️ Analýza vektorových prvků selhala: {e}")
+            print(f"[WARNING] Analýza vektorových prvků selhala: {e}")
             
     def test_vector_to_raster_conversion(self):
         """Test konverze vektorového PDF na rastr"""
@@ -132,7 +132,7 @@ class TestVectorPDF(unittest.TestCase):
                     self.assertIsNotNone(img)
                     self.assertTrue(isinstance(img, Image.Image))
         except Exception as e:
-            print(f"⚠️ Konverze vektorového PDF selhala: {e}")
+            print(f"[WARNING] Konverze vektorového PDF selhala: {e}")
 
 def run_vector_pdf_tests():
     """Spuštění testů vektorových PDF"""

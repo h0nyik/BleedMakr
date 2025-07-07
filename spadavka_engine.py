@@ -55,11 +55,11 @@ class SpadavkaEngine:
         img_array = np.array(img)
         
         # Debug informace
-        print(f"🔍 Analýza obrázku: {width}x{height} pixelů")
+        print(f"[ANALYZE] Analýza obrázku: {width}x{height} pixelů")
         
         # Kontrola režimu obrázku
         if img.mode == 'RGBA':
-            print(f"🎨 RGBA režim - kontrola průhlednosti a světlosti")
+            print(f"[COLOR] RGBA režim - kontrola průhlednosti a světlosti")
             # Pro RGBA kontrolujeme alpha kanál a světlost
             alpha_channel = img_array[:, :, 3]
             rgb_channels = img_array[:, :, :3]
@@ -106,7 +106,7 @@ class SpadavkaEngine:
                         right_border = x + 1
                         break
         else:
-            print(f"🎨 RGB režim - kontrola světlosti")
+            print(f"[COLOR] RGB režim - kontrola světlosti")
             # Pro RGB kontrolujeme světlost (průměrnou hodnotu RGB)
             # Detekce horního okraje
             top_border = 0
@@ -150,9 +150,9 @@ class SpadavkaEngine:
         area_reduction = ((original_area - cropped_area) / original_area) * 100
         
         # Debug informace
-        print(f"📐 Detekované okraje: left={left_border}, top={top_border}, right={right_border}, bottom={bottom_border}")
-        print(f"✂️ Ořezané rozměry: {right_border-left_border} x {bottom_border-top_border}")
-        print(f"📊 Snížení plochy: {area_reduction:.1f}%")
+        print(f"[OKRAJE] Detekované okraje: left={left_border}, top={top_border}, right={right_border}, bottom={bottom_border}")
+        print(f"[OREZ] Ořezané rozměry: {right_border-left_border} x {bottom_border-top_border}")
+        print(f"[STATS] Snížení plochy: {area_reduction:.1f}%")
         
         # Po detekci hran motivu ořízni ještě o extra_crop_px pixelů z každé strany (pokud to rozměry dovolí)
         left_border = min(max(0, left_border + self.extra_crop_px), width)
@@ -166,7 +166,7 @@ class SpadavkaEngine:
         width, height = img.size
         img_array = np.array(img)
         
-        print(f"🔍 Detekce okrajů obsahu: {width}x{height} pixelů")
+        print(f"[DETEKCE] Detekce okrajů obsahu: {width}x{height} pixelů")
         
         # Konverze do RGB pokud je potřeba
         if img.mode == 'RGBA':
@@ -217,16 +217,16 @@ class SpadavkaEngine:
         cropped_area = (right_border - left_border) * (bottom_border - top_border)
         area_reduction = ((original_area - cropped_area) / original_area) * 100
         
-        print(f"📐 Detekované okraje obsahu: left={left_border}, top={top_border}, right={right_border}, bottom={bottom_border}")
-        print(f"✂️ Ořezané rozměry: {right_border-left_border} x {bottom_border-top_border}")
-        print(f"📊 Snížení plochy: {area_reduction:.1f}%")
+        print(f"[OKRAJE] Detekované okraje obsahu: left={left_border}, top={top_border}, right={right_border}, bottom={bottom_border}")
+        print(f"[OREZ] Ořezané rozměry: {right_border-left_border} x {bottom_border-top_border}")
+        print(f"[STATS] Snížení plochy: {area_reduction:.1f}%")
         
         # Pokud se plocha snížila o méně než 1%, nepovažujeme to za významné ořezání
         if area_reduction < 1:
-            print(f"⚠️ Malé snížení plochy - použití původních rozměrů")
+            print(f"[WARNING] Malé snížení plochy - použití původních rozměrů")
             return 0, 0, width, height
         
-        print(f"✅ Významné snížení plochy - aplikování ořezu")
+        print(f"[OK] Významné snížení plochy - aplikování ořezu")
         return left_border, top_border, right_border, bottom_border
     
     def _create_intelligent_spadavka(self, img, width, height, new_width, new_height, original_mode):
@@ -304,7 +304,7 @@ class SpadavkaEngine:
     
     def _add_standard_mirrored_borders(self, original_img, new_img, width, height, new_width, new_height):
         """Původní metoda - nyní používá perfektní napojení"""
-        print(f"🔧 [NAPOJENÍ] Používám perfektní napojení barev...")
+        print(f"[NAPOJENI] Používám perfektní napojení barev...")
         self._add_perfect_mirrored_borders(original_img, new_img, width, height, new_width, new_height)
     
     def _add_perfect_mirrored_borders(self, original_img, new_img, width, height, new_width, new_height):
@@ -486,10 +486,10 @@ class SpadavkaEngine:
             img = Image.open(io.BytesIO(pix.tobytes("png")))
             spadavka_px = int(spadavka_points * scale_factor)
             
-            print(f"🔍 [DIAGNOSTIKA] Původní PDF: {original_width:.1f}x{original_height:.1f} bodů")
-            print(f"🔍 [DIAGNOSTIKA] Bitmapa: {img.size[0]}x{img.size[1]} px")
-            print(f"🔍 [DIAGNOSTIKA] Scale factor: {scale_factor:.3f}")
-            print(f"🔍 [DIAGNOSTIKA] Spadávka: {spadavka_points:.1f} bodů = {spadavka_px} px")
+            print(f"[DIAGNOSTIKA] Původní PDF: {original_width:.1f}x{original_height:.1f} bodů")
+            print(f"[DIAGNOSTIKA] Bitmapa: {img.size[0]}x{img.size[1]} px")
+            print(f"[DIAGNOSTIKA] Scale factor: {scale_factor:.3f}")
+            print(f"[DIAGNOSTIKA] Spadávka: {spadavka_points:.1f} bodů = {spadavka_px} px")
             
             # 2. Ořez bitmapy až na grafiku (žádná bílá na okraji)
             left, top, right, bottom = self._detect_white_borders(img, tolerance=15)
@@ -497,31 +497,31 @@ class SpadavkaEngine:
             # Kontrola zda je ořez smysluplný (minimálně 10 pixelů na každé straně)
             min_crop = 10
             if left < min_crop and top < min_crop and (img.size[0] - right) < min_crop and (img.size[1] - bottom) < min_crop:
-                print(f"🔍 [DIAGNOSTIKA] Detekovaný ořez je příliš malý - použiji původní rozměry")
+                print(f"[DIAGNOSTIKA] Detekovaný ořez je příliš malý - použiji původní rozměry")
                 left, top, right, bottom = 0, 0, img.size[0], img.size[1]
             
             cropped_img = img.crop((left, top, right, bottom))
             cropped_width, cropped_height = cropped_img.size
             
-            print(f"🔍 [DIAGNOSTIKA] Ořez: left={left}, top={top}, right={right}, bottom={bottom}")
-            print(f"🔍 [DIAGNOSTIKA] Ořezané rozměry: {cropped_width}x{cropped_height} px")
+            print(f"[DIAGNOSTIKA] Ořez: left={left}, top={top}, right={right}, bottom={bottom}")
+            print(f"[DIAGNOSTIKA] Ořezané rozměry: {cropped_width}x{cropped_height} px")
             
             # Převod ořezaných rozměrů na body
             cropped_width_points = cropped_width / scale_factor
             cropped_height_points = cropped_height / scale_factor
             
-            print(f"🔍 [DIAGNOSTIKA] Ořezané rozměry: {cropped_width_points:.1f}x{cropped_height_points:.1f} bodů")
+            print(f"[DIAGNOSTIKA] Ořezané rozměry: {cropped_width_points:.1f}x{cropped_height_points:.1f} bodů")
             
             # Nové rozměry PDF stránky musí odpovídat ořezané bitmapě + spadávka
             new_width = cropped_width_points + 2 * spadavka_points
             new_height = cropped_height_points + 2 * spadavka_points
             
-            print(f"🔍 [DIAGNOSTIKA] Nové rozměry stránky: {new_width:.1f}x{new_height:.1f} bodů")
+            print(f"[DIAGNOSTIKA] Nové rozměry stránky: {new_width:.1f}x{new_height:.1f} bodů")
 
             # 3. Vytvoření spadávky z ořezané bitmapy
             new_img = self._create_raster_bleed(cropped_img, spadavka_px, already_cropped=True)
             
-            print(f"🔍 [DIAGNOSTIKA] Spadávka vytvořena: {new_img.size[0]}x{new_img.size[1]} px")
+            print(f"[DIAGNOSTIKA] Spadávka vytvořena: {new_img.size[0]}x{new_img.size[1]} px")
 
             # --- OŘÍZNUTÍ bitmapy pouze na okraje, BEZ SOFT FADE ---
             presah_mm = 2
@@ -562,7 +562,7 @@ class SpadavkaEngine:
             crop_offset_x_points = left / scale_factor  # Převod na body
             crop_offset_y_points = top / scale_factor   # Převod na body
             
-            print(f"🔍 [DIAGNOSTIKA] Crop offset: {crop_offset_x_points:.1f}, {crop_offset_y_points:.1f} bodů")
+            print(f"[DIAGNOSTIKA] Crop offset: {crop_offset_x_points:.1f}, {crop_offset_y_points:.1f} bodů")
             
             # Pozice vektorové části na nové stránce
             vector_x = spadavka_points
@@ -570,8 +570,8 @@ class SpadavkaEngine:
             vector_width = cropped_width_points
             vector_height = cropped_height_points
             
-            print(f"🔍 [DIAGNOSTIKA] Vektorová pozice: x={vector_x:.1f}, y={vector_y:.1f}")
-            print(f"🔍 [DIAGNOSTIKA] Vektorová velikost: {vector_width:.1f}x{vector_height:.1f} bodů")
+            print(f"[DIAGNOSTIKA] Vektorová pozice: x={vector_x:.1f}, y={vector_y:.1f}")
+            print(f"[DIAGNOSTIKA] Vektorová velikost: {vector_width:.1f}x{vector_height:.1f} bodů")
             
             # Clip region - oblast z původní stránky
             clip_x = crop_offset_x_points
@@ -579,8 +579,8 @@ class SpadavkaEngine:
             clip_width = cropped_width_points
             clip_height = cropped_height_points
             
-            print(f"🔍 [DIAGNOSTIKA] Clip region: x={clip_x:.1f}, y={clip_y:.1f}")
-            print(f"🔍 [DIAGNOSTIKA] Clip velikost: {clip_width:.1f}x{clip_height:.1f} bodů")
+            print(f"[DIAGNOSTIKA] Clip region: x={clip_x:.1f}, y={clip_y:.1f}")
+            print(f"[DIAGNOSTIKA] Clip velikost: {clip_width:.1f}x{clip_height:.1f} bodů")
             
             new_page.show_pdf_page(
                 fitz.Rect(
@@ -599,7 +599,7 @@ class SpadavkaEngine:
             )
             
             # 6. KONTROLA NAPOJENÍ PIXELŮ
-            print(f"🔍 [KONTROLA NAPOJENÍ] Ověřuji shodu pixelů na hranicích...")
+            print(f"[KONTROLA NAPOJENI] Ověřuji shodu pixelů na hranicích...")
             
             try:
                 # Vytvoření kontrolní bitmapy pro porovnání
@@ -610,8 +610,8 @@ class SpadavkaEngine:
                 # Kontrola napojení na hranicích spadávky
                 self._check_bleed_alignment(control_img, spadavka_px)
             except Exception as e:
-                print(f"⚠️ [KONTROLA NAPOJENÍ] Chyba při kontrole napojení: {e}")
-                print(f"🔄 [KONTROLA NAPOJENÍ] Pokračujem bez kontroly napojení...")
+                print(f"[WARNING] [KONTROLA NAPOJENÍ] Chyba při kontrole napojení: {e}")
+                print(f"[FALLBACK] [KONTROLA NAPOJENÍ] Pokračujem bez kontroly napojení...")
 
             new_doc.save(output_path, garbage=4, deflate=True)
             new_doc.close()
@@ -627,10 +627,10 @@ class SpadavkaEngine:
             
             # Bezpečnostní kontrola rozměrů
             if width <= spadavka_px * 2 or height <= spadavka_px * 2:
-                print(f"⚠️ [NAPOJENÍ] Obrázek příliš malý pro kontrolu napojení")
+                print(f"[WARNING] [NAPOJENÍ] Obrázek příliš malý pro kontrolu napojení")
                 return
             
-            print(f"🔍 [NAPOJENÍ] Kontroluji obrázek {width}x{height} px, spadávka {spadavka_px} px")
+            print(f"[NAPOJENI] Kontroluji obrázek {width}x{height} px, spadávka {spadavka_px} px")
             
             # Kontrola horní hranice - bezpečněji
             differences_found = 0
@@ -645,15 +645,15 @@ class SpadavkaEngine:
                        abs(pixel_above[2] - pixel_below[2]) > 2:
                         differences_found += 1
                         if differences_found <= 3:  # Zobrazit jen první 3 rozdíly
-                            print(f"⚠️ [NAPOJENÍ] Rozdíl na horní hranici x={x}: {pixel_above} vs {pixel_below}")
+                            print(f"[WARNING] [NAPOJENÍ] Rozdíl na horní hranici x={x}: {pixel_above} vs {pixel_below}")
                 except Exception as e:
-                    print(f"⚠️ [NAPOJENÍ] Chyba při čtení pixelu na pozici x={x}: {e}")
+                    print(f"[WARNING] [NAPOJENÍ] Chyba při čtení pixelu na pozici x={x}: {e}")
                     break
             
             if differences_found == 0:
-                print(f"✅ [NAPOJENÍ] Horní hranice - OK")
+                print(f"[OK] [NAPOJENÍ] Horní hranice - OK")
             else:
-                print(f"⚠️ [NAPOJENÍ] Horní hranice - nalezeno {differences_found} rozdílů")
+                print(f"[WARNING] [NAPOJENÍ] Horní hranice - nalezeno {differences_found} rozdílů")
             
             # Kontrola levé hranice - bezpečněji
             differences_found = 0
@@ -668,18 +668,18 @@ class SpadavkaEngine:
                        abs(pixel_left[2] - pixel_right[2]) > 2:
                         differences_found += 1
                         if differences_found <= 3:  # Zobrazit jen první 3 rozdíly
-                            print(f"⚠️ [NAPOJENÍ] Rozdíl na levé hranici y={y}: {pixel_left} vs {pixel_right}")
+                            print(f"[WARNING] [NAPOJENÍ] Rozdíl na levé hranici y={y}: {pixel_left} vs {pixel_right}")
                 except Exception as e:
-                    print(f"⚠️ [NAPOJENÍ] Chyba při čtení pixelu na pozici y={y}: {e}")
+                    print(f"[WARNING] [NAPOJENÍ] Chyba při čtení pixelu na pozici y={y}: {e}")
                     break
                     
             if differences_found == 0:
-                print(f"✅ [NAPOJENÍ] Levá hranice - OK")
+                print(f"[OK] [NAPOJENÍ] Levá hranice - OK")
             else:
-                print(f"⚠️ [NAPOJENÍ] Levá hranice - nalezeno {differences_found} rozdílů")
+                print(f"[WARNING] [NAPOJENÍ] Levá hranice - nalezeno {differences_found} rozdílů")
                 
         except Exception as e:
-            print(f"⚠️ [NAPOJENÍ] Chyba při kontrole: {e}")
+            print(f"[WARNING] [NAPOJENÍ] Chyba při kontrole: {e}")
     
     def _add_vector_bleed(self, original_page, new_page, width, height, spadavka_points):
         """Přidá vektorovou spadávku pomocí zrcadlení vektorových objektů"""
@@ -688,18 +688,18 @@ class SpadavkaEngine:
             drawings = original_page.get_drawings()
             
             if not drawings:
-                print("⚠️ Žádné vektorové objekty nenalezeny - použití rastrové spadávky")
+                print("[WARNING] Žádné vektorové objekty nenalezeny - použití rastrové spadávky")
                 self._add_raster_bleed_fallback(original_page, new_page, width, height, spadavka_points)
                 return
             
-            print(f"🎨 Nalezeno {len(drawings)} vektorových objektů")
+            print(f"[VECTOR] Nalezeno {len(drawings)} vektorových objektů")
             
             # Přidání zrcadlených objektů pro spadávku
             self._mirror_vector_objects(drawings, new_page, width, height, spadavka_points)
             
         except Exception as e:
-            print(f"⚠️ Chyba při vektorovém zpracování: {e}")
-            print("🔄 Použití rastrové spadávky jako zálohy")
+            print(f"[WARNING] Chyba při vektorovém zpracování: {e}")
+            print("[FALLBACK] Použití rastrové spadávky jako zálohy")
             self._add_raster_bleed_fallback(original_page, new_page, width, height, spadavka_points)
     
     def _mirror_vector_objects(self, drawings, new_page, width, height, spadavka_points):
@@ -775,7 +775,7 @@ class SpadavkaEngine:
             new_page.insert_image(new_page.rect, stream=img_bytes.getvalue())
             
         except Exception as e:
-            print(f"❌ Chyba při rastrové spadávce: {e}")
+            print(f"[ERROR] Chyba při rastrové spadávce: {e}")
             # Pokud selže i rastrová spadávka, pokračujeme bez ní
     
     def _process_eps(self, input_path, output_path):
@@ -982,9 +982,9 @@ class SpadavkaEngine:
                 if ref_pixel != current_pixel:
                     spadavka_img.putpixel((x, height - spadavka_px), ref_pixel)
             
-            print(f"🎨 [COLOR MATCHING] Aplikována korekce barev na hranicích")
+            print(f"[COLOR MATCHING] Aplikována korekce barev na hranicích")
             return spadavka_img
             
         except Exception as e:
-            print(f"⚠️ [COLOR MATCHING] Chyba při color matching: {e}")
+            print(f"[WARNING] [COLOR MATCHING] Chyba při color matching: {e}")
             return spadavka_img 

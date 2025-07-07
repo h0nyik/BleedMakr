@@ -17,7 +17,7 @@ try:
     from spadavka_engine import SpadavkaEngine
     from spadavka_generator import BleedMakrApp
 except ImportError as e:
-    print(f"❌ Chyba importu: {e}")
+    print(f"[ERROR] Chyba importu: {e}")
     sys.exit(1)
 
 class TestBleedMakrApp(unittest.TestCase):

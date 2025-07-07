@@ -89,7 +89,7 @@ class SpadavkaGenerator:
         title_frame.pack(fill='x', padx=20, pady=20)
         
         title_label = ttk.Label(title_frame, 
-                               text="🎨 BleedMakr v0.0.1",
+                               text="BleedMakr v0.0.1",
                                style='Title.TLabel')
         title_label.pack()
         
@@ -183,7 +183,7 @@ class SpadavkaGenerator:
         generate_frame.pack(fill='x', padx=10, pady=20)
         
         self.generate_button = ttk.Button(generate_frame, 
-                                         text="🚀 Generovat spadávky",
+                                         text="Generovat spadávky",
                                          command=self.generate_spadavky,
                                          style='Modern.TButton')
         self.generate_button.pack(fill='x')
@@ -477,7 +477,7 @@ class SpadavkaGenerator:
             
             for i, file_path in enumerate(self.input_files):
                 filename = os.path.basename(file_path)
-                self.log_message(f"➡️ Začínám: {filename}")
+                self.log_message(f"[START] Začínám: {filename}")
                 self.update_progress(i, total_files, f"Zpracovávám: {filename}")
                 
                 try:
@@ -487,13 +487,13 @@ class SpadavkaGenerator:
                     # Zpracování s informacemi o metodě
                     result, processing_info = engine.generate_spadavka(file_path, output_path)
                     
-                    self.log_message(f"✅ Dokončeno: {filename}")
-                    self.log_message(f"   📋 Metoda: {processing_info}")
+                    self.log_message(f"[OK] Dokončeno: {filename}")
+                    self.log_message(f"   [INFO] Metoda: {processing_info}")
                     successful += 1
                     
                 except Exception as e:
                     error_msg = str(e)
-                    self.log_message(f"❌ Chyba u {filename}: {error_msg}")
+                    self.log_message(f"[ERROR] Chyba u {filename}: {error_msg}")
                     failed += 1
                     
                 # Aktualizace progress baru
@@ -505,13 +505,13 @@ class SpadavkaGenerator:
                 self.status_label.config(text="Vše dokončeno", foreground='#27ae60')
                 messagebox.showinfo("Úspěch", f"Všechny spadávky ({successful}) byly úspěšně vygenerovány!")
             else:
-                self.log_message(f"⚠️ Dokončeno: {successful} úspěšně, {failed} chyb")
+                self.log_message(f"[WARNING] Dokončeno: {successful} úspěšně, {failed} chyb")
                 self.status_label.config(text=f"Dokončeno ({successful}/{total_files})", foreground='#f39c12')
                 messagebox.showwarning("Dokončeno s chybami", 
                                      f"Zpracováno {successful} souborů úspěšně, {failed} s chybami.\nZkontrolujte log pro detaily.")
                 
         except Exception as e:
-            self.log_message(f"❌ Kritická chyba: {str(e)}")
+            self.log_message(f"[ERROR] Kritická chyba: {str(e)}")
             self.status_label.config(text="Chyba", foreground='#e74c3c')
             messagebox.showerror("Kritická chyba", f"Došlo k kritické chybě: {str(e)}")
             
