@@ -131,13 +131,13 @@ excludes = [
 ]
 
 a = Analysis(
-    ['spadavka_generator.py'],
-    pathex=[],
+    ['../src/spadavka_generator.py'],
+    pathex=['../src'],
     binaries=[],
     datas=[
-        ('README.md', '.'),
-        ('LICENSE', '.'),
-        ('version.txt', '.')
+        ('../docs/README.md', '.'),
+        ('../LICENSE', '.'),
+        ('../version.txt', '.')
     ],
     hiddenimports=hidden_imports,
     hookspath=[],
@@ -314,9 +314,9 @@ def create_release_package():
     # Kopírování souborů
     files_to_copy = [
         ("dist/BleedMakr.exe", "BleedMakr.exe"),
-        ("README.md", "README.md"),
-        ("LICENSE", "LICENSE"),
-        ("version.txt", "version.txt")
+        ("../docs/README.md", "README.md"),
+        ("../LICENSE", "LICENSE"),
+        ("../version.txt", "version.txt")
     ]
     
     for src, dst in files_to_copy:

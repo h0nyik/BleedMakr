@@ -33,7 +33,7 @@ REM Spuštění aplikace
 echo.
 echo Spoustim BleedMakr...
 echo.
-python spadavka_generator.py
+python src/spadavka_generator.py
 
 REM Kontrola chyby při spuštění
 if errorlevel 1 (

@@ -34,7 +34,7 @@ jobs:
         
     - name: Build EXE
       run: |
-        python build_exe.py
+        python scripts/build_exe.py
         
     - name: Test EXE
       run: |
