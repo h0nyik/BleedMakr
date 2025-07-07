@@ -1,4 +1,4 @@
-name: Python application
+name: Test
 
 on:
   push:
@@ -7,16 +7,16 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.8'
+        python-version: '3.11'
 
     - name: Install dependencies
       run: |
@@ -25,7 +25,7 @@ jobs:
 
     - name: Run tests
       run: |
-        python test_app.py
-        python test_white_borders.py
-        python test_pdf_bleed.py
-        python test_vector_pdf.py 
+        python tests/test_app.py
+        python tests/test_white_borders.py
+        python tests/test_pdf_bleed.py
+        python tests/test_vector_pdf.py 
