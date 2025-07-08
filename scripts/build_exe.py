@@ -12,6 +12,12 @@ import shutil
 import platform
 from pathlib import Path
 
+# --- Přidáno: kontrola na složku numpy v aktuálním adresáři ---
+if os.path.isdir('numpy'):
+    print('[WARNING] V aktuálním adresáři je složka numpy! To může způsobit chybu při importu numpy.')
+    print('  Smažte nebo přesuňte složku numpy mimo projekt, nebo build adresář.')
+# --- konec kontroly ---
+
 def get_platform_info():
     """Vrati informace o platforme pro build"""
     system = platform.system().lower()
