@@ -177,8 +177,8 @@ jobs:
         draft: false
         prerelease: true
         files: |
-          ./BleedMakr-Windows-x64/*
-          ./BleedMakr-macOS-x64/*
-          ./BleedMakr-Linux-x64/*
+          ./BleedMakr-Windows-x64/BleedMakr-windows.exe
+          ./BleedMakr-macOS-x64/BleedMakr-macos
+          ./BleedMakr-Linux-x64/BleedMakr-linux
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
