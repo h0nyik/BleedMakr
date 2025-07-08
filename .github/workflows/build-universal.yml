@@ -1,4 +1,4 @@
-name: Build Universal Release
+name: Build Universal Release (Updated)
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
     - name: Upload Windows Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: BleedMakr-Windows-x64
+        name: BleedMakr-Windows-x64-${{ matrix.python-version }}
         path: scripts/dist/
         retention-days: 1
 
@@ -72,7 +72,7 @@ jobs:
     - name: Upload macOS Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: BleedMakr-macOS-x64
+        name: BleedMakr-macOS-x64-${{ matrix.python-version }}
         path: scripts/dist/
         retention-days: 1
 
@@ -109,7 +109,7 @@ jobs:
     - name: Upload Linux Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: BleedMakr-Linux-x64
+        name: BleedMakr-Linux-x64-${{ matrix.python-version }}
         path: scripts/dist/
         retention-days: 1
 
@@ -160,7 +160,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./BleedMakr-Windows-x64/BleedMakr.exe
+        asset_path: ./BleedMakr-Windows-x64-3.11/BleedMakr.exe
         asset_name: BleedMakr-Windows-x64.exe
         asset_content_type: application/octet-stream
     
@@ -170,7 +170,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./BleedMakr-macOS-x64/BleedMakr
+        asset_path: ./BleedMakr-macOS-x64-3.11/BleedMakr
         asset_name: BleedMakr-macOS-x64
         asset_content_type: application/octet-stream
     
@@ -180,6 +180,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./BleedMakr-Linux-x64/BleedMakr
+        asset_path: ./BleedMakr-Linux-x64-3.11/BleedMakr
         asset_name: BleedMakr-Linux-x64
         asset_content_type: application/octet-stream 
