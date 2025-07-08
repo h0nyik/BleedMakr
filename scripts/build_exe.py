@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Build script pro vytvoreni .exe release BleedMakr
+Build script pro vytvoreni univerzalniho release BleedMakr
+Podporuje Windows, macOS a Linux
 Optimalizovano pro minimalni velikost a rychle spusteni
 """
 
@@ -8,7 +9,22 @@ import os
 import sys
 import subprocess
 import shutil
+import platform
 from pathlib import Path
+
+def get_platform_info():
+    """Vrati informace o platforme pro build"""
+    system = platform.system().lower()
+    machine = platform.machine().lower()
+    
+    if system == "windows":
+        return "Windows", "exe", "BleedMakr.exe"
+    elif system == "darwin":  # macOS
+        return "macOS", "app", "BleedMakr"
+    elif system == "linux":
+        return "Linux", "bin", "BleedMakr"
+    else:
+        return "Unknown", "bin", "BleedMakr"
 
 def run_command(cmd, description):
     """Spusti prikaz a zobrazi vystup"""
@@ -33,6 +49,8 @@ def run_command(cmd, description):
 
 def create_spec_file():
     """Vytvori optimalizovany .spec soubor pro PyInstaller"""
+    platform_name, platform_ext, exe_name = get_platform_info()
+    
     # Určení správné cesty k hlavnímu souboru
     main_file = 'src/spadavka_generator.py'
     if not os.path.exists(main_file):
@@ -61,7 +79,19 @@ def create_spec_file():
         print(f"[ERROR] Hlavni soubor {main_file} nenalezen")
         return False
     
+    print(f"[INFO] Platforma: {platform_name}")
     print(f"[INFO] Nalezene datove soubory: {data_files}")
+    
+    # Platform-specific nastaveni
+    if platform_name == "Windows":
+        console_setting = "False"  # GUI aplikace
+        icon_setting = "'icon.ico' if os.path.exists('icon.ico') else None"
+    elif platform_name == "macOS":
+        console_setting = "False"  # GUI aplikace
+        icon_setting = "'icon.icns' if os.path.exists('icon.icns') else None"
+    else:  # Linux
+        console_setting = "False"  # GUI aplikace
+        icon_setting = "None"
     
     spec_content = f'''# -*- mode: python ; coding: utf-8 -*-
 
@@ -175,13 +205,13 @@ exe = EXE(
     upx=use_upx,  # Vypnout UPX na GitHub Actions
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # GUI aplikace
+    console={console_setting},  # GUI aplikace
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon.ico' if os.path.exists('icon.ico') else None,
+    icon={icon_setting},
     version='version_info.txt' if os.path.exists('version_info.txt') else None
 )
 '''
@@ -189,7 +219,7 @@ exe = EXE(
     with open('BleedMakr.spec', 'w', encoding='utf-8') as f:
         f.write(spec_content)
     
-    print("OK: Vytvoren optimalizovany .spec soubor")
+    print(f"OK: Vytvoren optimalizovany .spec soubor pro {platform_name}")
 
 def create_version_info():
     """Vytvori version info soubor pro Windows exe"""
@@ -282,7 +312,9 @@ def install_dependencies():
 
 def build_exe():
     """Sestavi .exe soubor"""
-    print("\nSestavovani .exe souboru...")
+    print("\nSestavovani aplikace...")
+    
+    platform_name, platform_ext, exe_name = get_platform_info()
     
     # Vycisleni predchozich buildu
     for dir_name in ['build', 'dist', '__pycache__']:
@@ -297,7 +329,7 @@ def build_exe():
     
     # Sestaveni
     cmd = "pyinstaller --clean --noconfirm BleedMakr.spec"
-    if not run_command(cmd, "Sestavovani pomoci PyInstaller"):
+    if not run_command(cmd, f"Sestavovani pomoci PyInstaller pro {platform_name}"):
         print("CHYBA: PyInstaller selhal")
         # Diagnostika
         if os.path.exists('build'):
@@ -307,14 +339,14 @@ def build_exe():
         return False
     
     # Kontrola vysledku
-    exe_path = Path("dist/BleedMakr.exe")
+    exe_path = Path(f"dist/{exe_name}")
     if exe_path.exists():
         size_mb = exe_path.stat().st_size / (1024 * 1024)
         print(f"OK: Uspechne vytvoren: {exe_path}")
         print(f"   Velikost: {size_mb:.1f} MB")
         return True
     else:
-        print("CHYBA: .exe soubor nebyl vytvoren")
+        print(f"CHYBA: {exe_name} nebyl vytvoren")
         
         # Diagnostika
         print("   Diagnostika:")
@@ -338,6 +370,8 @@ def create_release_package():
     """Vytvori balicek pro release"""
     print("\nVytvareni release balicku...")
     
+    platform_name, platform_ext, exe_name = get_platform_info()
+    
     # Nacteni verze z version.txt
     version = "0.0.1"  # vychozi hodnota
     version_files = ["version.txt", "../version.txt"]
@@ -358,9 +392,9 @@ def create_release_package():
     
     release_dir.mkdir()
     
-    # Kopirovani souboru
+    # Kopirovani souboru podle platformy
     files_to_copy = [
-        ("dist/BleedMakr.exe", "BleedMakr.exe"),
+        (f"dist/{exe_name}", exe_name),
         ("docs/README.md", "README.md"),
         ("LICENSE", "LICENSE"),
         ("version.txt", "version.txt")
@@ -374,8 +408,8 @@ def create_release_package():
             shutil.copy2(f"../{src}", release_dir / dst)
             print(f"   Zkopirovano: ../{src} -> {dst}")
     
-    # Vytvoreni ZIP archivu
-    zip_name = f"BleedMakr-v{version}-Windows-x64"
+    # Vytvoreni ZIP archivu s platform-specific nazvem
+    zip_name = f"BleedMakr-v{version}-{platform_name}-x64"
     shutil.make_archive(zip_name, 'zip', release_dir)
     print(f"OK: Vytvoren release balicek: {zip_name}.zip")
     
@@ -383,7 +417,9 @@ def create_release_package():
 
 def main():
     """Hlavni funkce build procesu"""
-    print("BleedMakr - Build .exe release")
+    platform_name, platform_ext, exe_name = get_platform_info()
+    
+    print(f"BleedMakr - Build {platform_name} release")
     print("=" * 50)
     
     # Kontrola Python verze
@@ -392,6 +428,7 @@ def main():
         return False
     
     print(f"OK: Python {sys.version}")
+    print(f"OK: Platforma: {platform_name}")
     
     # Kontrola, zda jsme ve správné složce
     src_path = '../src/spadavka_generator.py'
@@ -412,17 +449,17 @@ def main():
     create_spec_file()
     create_version_info()
     
-    # Sestaveni .exe
+    # Sestaveni aplikace
     if not build_exe():
         return False
     
     # Vytvoreni release balicku
     zip_file = create_release_package()
     
-    print("\nBuild dokoncen uspesne!")
-    print(f"   .exe soubor: dist/BleedMakr.exe")
+    print(f"\nBuild dokoncen uspesne pro {platform_name}!")
+    print(f"   Aplikace: dist/{exe_name}")
     print(f"   Release balicek: {zip_file}")
-    print("\nNyni muzete nahrat na GitHub jako release.")
+    print(f"\nNyni muzete nahrat na GitHub jako release pro {platform_name}.")
     
     return True
 

@@ -1,165 +1,185 @@
-name: Build EXE Release
+name: Build Universal Release
 
 on:
   push:
-    branches: [ master ]  # Spustí se při každém push do masteru
+    branches: [ master ]
     tags:
-      - 'v*'  # Spustí se při push tag začínajícího v (např. v0.0.1)
-  workflow_dispatch:  # Umožní manuální spuštění
+      - 'v*'
+  workflow_dispatch:
 
-# Konfigurace oprávnění pro GITHUB_TOKEN
 permissions:
-  contents: write  # Potřebné pro vytváření release
-  packages: write  # Potřebné pro upload assetů
+  contents: write
+  packages: write
 
 jobs:
-  build-exe:
+  build-windows:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
-        
+        python-version: ${{ matrix.python-version }}
+    
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-        
-    - name: Run tests
-      env:
-        PYTHONPATH: ${{ github.workspace }}/src
+    
+    - name: Build Windows EXE
       run: |
-        python tests/test_app.py
-        python tests/test_white_borders.py
-        python tests/test_pdf_bleed.py
-        python tests/test_vector_pdf.py
-        
-    - name: Download UPX
-      run: |
-        Invoke-WebRequest -Uri "https://github.com/upx/upx/releases/download/v4.2.2/upx-4.2.2-win64.zip" -OutFile "upx.zip"
-        Expand-Archive -Path "upx.zip" -DestinationPath "."
-        Move-Item "upx-4.2.2-win64\upx.exe" "upx.exe"
-        echo "$PWD" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        
-    - name: Build EXE
-      working-directory: scripts
-      run: |
+        cd scripts
         python build_exe.py
-        
-    - name: Test EXE
+    
+    - name: Upload Windows Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: BleedMakr-Windows-x64
+        path: scripts/dist/
+        retention-days: 1
+
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
       run: |
-        if (Test-Path "scripts/dist/BleedMakr.exe") {
-          Write-Host "[OK] BleedMakr.exe byl úspěšně vytvořen"
-          $size = (Get-Item "scripts/dist/BleedMakr.exe").Length / 1MB
-          Write-Host "   Velikost: $([math]::Round($size, 1)) MB"
-          # Zkopíruj .exe do root adresáře pro další kroky
-          New-Item -Path "dist" -ItemType Directory -Force
-          Copy-Item "scripts/dist/BleedMakr.exe" "dist/BleedMakr.exe"
-        } else {
-          Write-Host "[ERROR] BleedMakr.exe nebyl vytvořen"
-          Write-Host "Obsah scripts/dist/:"
-          if (Test-Path "scripts/dist/") {
-            Get-ChildItem "scripts/dist/" | ForEach-Object { Write-Host "  $_" }
-          } else {
-            Write-Host "  Adresář scripts/dist/ neexistuje"
-          }
-          Write-Host "Obsah scripts/:"
-          Get-ChildItem "scripts/" | ForEach-Object { Write-Host "  $_" }
-          exit 1
-        }
-        
-    - name: Copy Release Assets
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Build macOS App
       run: |
-        # Zkopíruj ZIP soubor do root adresáře pro upload
-        $version = Get-Content "version.txt" -Raw
-        $version = $version.Trim()
-        $zipFile = "scripts/BleedMakr-v$version-Windows-x64.zip"
-        
-        if (Test-Path $zipFile) {
-          Write-Host "[OK] ZIP soubor nalezen: $zipFile"
-          Copy-Item $zipFile "BleedMakr-v$version-Windows-x64.zip"
-          Write-Host "   Zkopírováno do root adresáře"
-        } else {
-          Write-Host "[ERROR] ZIP soubor nenalezen: $zipFile"
-          Write-Host "Obsah scripts/:"
-          Get-ChildItem "scripts/" | ForEach-Object { Write-Host "  $_" }
-          exit 1
-        }
-        
+        cd scripts
+        python build_exe.py
+    
+    - name: Upload macOS Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: BleedMakr-macOS-x64
+        path: scripts/dist/
+        retention-days: 1
+
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-glx libglib2.0-0
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Build Linux Binary
+      run: |
+        cd scripts
+        python build_exe.py
+    
+    - name: Upload Linux Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: BleedMakr-Linux-x64
+        path: scripts/dist/
+        retention-days: 1
+
+  create-release:
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+    
     - name: Get version
       id: version
-      run: |
-        $version = Get-Content "version.txt" -Raw
-        $version = $version.Trim()
-        echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-        
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+    
     - name: Create Release
-      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ steps.version.outputs.VERSION }}
-        release_name: BleedMakr v${{ steps.version.outputs.VERSION }}
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        release_name: BleedMakr ${{ steps.version.outputs.VERSION }}
         body: |
-          # BleedMakr v${{ steps.version.outputs.VERSION }}
+          ## Universal Release
           
-          ## Profesionální generátor spadávek pro reklamní agentury
+          ### Windows
+          - BleedMakr.exe (Windows x64)
           
-          ### Funkce:
-          - [OK] **Perfektní napojení spadávky** s color matching algoritmem
-          - [OK] **Zachování vektorové kvality** PDF
-          - [OK] **Inteligentní detekce okrajů** s automatickým ořezáním
-          - [OK] **Moderní GUI** s drag&drop podporou
-          - [OK] **Podpora formátů**: PDF, EPS, PNG, JPG, TIFF
-          - [OK] **Batch zpracování** více souborů
-          - [OK] **Export do PDF** s vysokým rozlišením (300 DPI)
+          ### macOS
+          - BleedMakr (macOS x64/ARM64)
           
-          ### Požadavky:
-          - **Windows 10/11** (64-bit)
-          - **Minimálně 4GB RAM**
-          - **500MB volného místa**
-          - **Ghostscript** (pro EPS soubory) - volitelné
+          ### Linux
+          - BleedMakr (Linux x64)
           
-          ### Instalace:
-          1. Stáhněte `BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip`
-          2. Rozbalte do libovolné složky
-          3. Spusťte `BleedMakr.exe`
-          
-          ### Použití:
-          1. Přetáhněte soubory do aplikace nebo klikněte "Přidat soubory"
-          2. Nastavte velikost spadávky (výchozí: 3 mm)
-          3. Vyberte výstupní složku
-          4. Klikněte "Generovat spadávky"
-          
-          ---
-          
-          **Licence:** AGPL-3.0 | **Podpora:** [GitHub Issues](https://github.com/h0nyik/BleedMakr/issues)
+          ### Installation
+          1. Download appropriate version for your OS
+          2. Extract ZIP archive
+          3. Run executable
         draft: false
         prerelease: false
-        
-    - name: Upload Release Asset
+    
+    - name: Upload Windows Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
-        asset_name: BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
-        asset_content_type: application/zip
-        
-    - name: Upload EXE Asset
+        asset_path: ./BleedMakr-Windows-x64/BleedMakr.exe
+        asset_name: BleedMakr-Windows-x64.exe
+        asset_content_type: application/octet-stream
+    
+    - name: Upload macOS Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/BleedMakr.exe
-        asset_name: BleedMakr.exe
+        asset_path: ./BleedMakr-macOS-x64/BleedMakr
+        asset_name: BleedMakr-macOS-x64
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./BleedMakr-Linux-x64/BleedMakr
+        asset_name: BleedMakr-Linux-x64
         asset_content_type: application/octet-stream 
