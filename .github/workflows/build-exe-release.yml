@@ -7,6 +7,11 @@ on:
       - 'v*'  # Spustí se při push tag začínajícího v (např. v0.0.1)
   workflow_dispatch:  # Umožní manuální spuštění
 
+# Konfigurace oprávnění pro GITHUB_TOKEN
+permissions:
+  contents: write  # Potřebné pro vytváření release
+  packages: write  # Potřebné pro upload assetů
+
 jobs:
   build-exe:
     runs-on: windows-latest
@@ -64,6 +69,24 @@ jobs:
           } else {
             Write-Host "  Adresář scripts/dist/ neexistuje"
           }
+          Write-Host "Obsah scripts/:"
+          Get-ChildItem "scripts/" | ForEach-Object { Write-Host "  $_" }
+          exit 1
+        }
+        
+    - name: Copy Release Assets
+      run: |
+        # Zkopíruj ZIP soubor do root adresáře pro upload
+        $version = Get-Content "version.txt" -Raw
+        $version = $version.Trim()
+        $zipFile = "scripts/BleedMakr-v$version-Windows-x64.zip"
+        
+        if (Test-Path $zipFile) {
+          Write-Host "[OK] ZIP soubor nalezen: $zipFile"
+          Copy-Item $zipFile "BleedMakr-v$version-Windows-x64.zip"
+          Write-Host "   Zkopírováno do root adresáře"
+        } else {
+          Write-Host "[ERROR] ZIP soubor nenalezen: $zipFile"
           Write-Host "Obsah scripts/:"
           Get-ChildItem "scripts/" | ForEach-Object { Write-Host "  $_" }
           exit 1
@@ -127,7 +150,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./scripts/BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
+        asset_path: ./BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
         asset_name: BleedMakr-v${{ steps.version.outputs.VERSION }}-Windows-x64.zip
         asset_content_type: application/zip
         

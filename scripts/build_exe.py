@@ -240,7 +240,27 @@ exe = EXE(
 
 def create_version_info():
     """Vytvori version info soubor pro Windows exe"""
-    version_info = '''# UTF-8
+    # Nacteni verze z version.txt
+    version = "0.0.1"  # vychozi hodnota
+    version_files = ["version.txt", "../version.txt"]
+    
+    for version_file in version_files:
+        if os.path.exists(version_file):
+            try:
+                with open(version_file, 'r', encoding='utf-8') as f:
+                    version = f.read().strip()
+                print(f"   Nactena verze pro version info: {version}")
+                break
+            except Exception as e:
+                print(f"   Chyba cteni {version_file}: {e}")
+    
+    # Rozdeleni verze na cisla
+    version_parts = version.split('.')
+    major = int(version_parts[0]) if len(version_parts) > 0 else 0
+    minor = int(version_parts[1]) if len(version_parts) > 1 else 0
+    patch = int(version_parts[2]) if len(version_parts) > 2 else 0
+    
+    version_info = f'''# UTF-8
 #
 # For more details about fixed file info 'ffi' see:
 # http://msdn.microsoft.com/en-us/library/ms646997.aspx
@@ -248,8 +268,8 @@ VSVersionInfo(
   ffi=FixedFileInfo(
     # filevers and prodvers should be always a tuple with four items: (1, 2, 3, 4)
     # Set not needed items to zero 0.
-    filevers=(0, 0, 1, 0),
-    prodvers=(0, 0, 1, 0),
+    filevers=({major}, {minor}, {patch}, 0),
+    prodvers=({major}, {minor}, {patch}, 0),
     # Contains a bitmask that specifies the valid bits 'flags'r
     mask=0x3f,
     # Contains a bitmask that specifies the Boolean attributes of the file.
@@ -273,12 +293,12 @@ VSVersionInfo(
         u'040904B0',
         [StringStruct(u'CompanyName', u'BleedMakr'),
         StringStruct(u'FileDescription', u'Profesionalni generator spadavky'),
-        StringStruct(u'FileVersion', u'0.0.1'),
+        StringStruct(u'FileVersion', u'{version}'),
         StringStruct(u'InternalName', u'BleedMakr'),
         StringStruct(u'LegalCopyright', u'© 2025 BleedMakr. AGPL-3.0 License'),
         StringStruct(u'OriginalFilename', u'BleedMakr.exe'),
         StringStruct(u'ProductName', u'BleedMakr'),
-        StringStruct(u'ProductVersion', u'0.0.1')])
+        StringStruct(u'ProductVersion', u'{version}')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]
@@ -365,6 +385,20 @@ def create_release_package():
     """Vytvori balicek pro release"""
     print("\nVytvareni release balicku...")
     
+    # Nacteni verze z version.txt
+    version = "0.0.1"  # vychozi hodnota
+    version_files = ["version.txt", "../version.txt"]
+    
+    for version_file in version_files:
+        if os.path.exists(version_file):
+            try:
+                with open(version_file, 'r', encoding='utf-8') as f:
+                    version = f.read().strip()
+                print(f"   Nactena verze: {version}")
+                break
+            except Exception as e:
+                print(f"   Chyba cteni {version_file}: {e}")
+    
     release_dir = Path("release")
     if release_dir.exists():
         shutil.rmtree(release_dir)
@@ -383,9 +417,12 @@ def create_release_package():
         if os.path.exists(src):
             shutil.copy2(src, release_dir / dst)
             print(f"   Zkopirovano: {src} -> {dst}")
+        elif os.path.exists(f"../{src}"):
+            shutil.copy2(f"../{src}", release_dir / dst)
+            print(f"   Zkopirovano: ../{src} -> {dst}")
     
     # Vytvoreni ZIP archivu
-    zip_name = "BleedMakr-v0.0.1-Windows-x64"
+    zip_name = f"BleedMakr-v{version}-Windows-x64"
     shutil.make_archive(zip_name, 'zip', release_dir)
     print(f"OK: Vytvoren release balicek: {zip_name}.zip")
     
