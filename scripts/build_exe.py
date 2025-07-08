@@ -87,7 +87,12 @@ hidden_imports = [
     'sys',
     'pathlib',
     'shutil',
-    'subprocess'
+    'subprocess',
+    'zipfile',  # Potřebné pro práci s ZIP soubory
+    'json',     # Potřebné pro práci s JSON
+    'logging',  # Potřebné pro logování
+    'warnings', # Potřebné pro warnings
+    'traceback' # Potřebné pro error handling
 ]
 
 # Vynechani nepotrebnych modulu
