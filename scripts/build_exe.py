@@ -133,7 +133,6 @@ excludes = [
     'argparse',
     'configparser',
     'logging',
-    'warnings',
     'traceback',
     'pdb',
     'profile',
