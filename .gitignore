@@ -336,3 +336,31 @@ scripts/*.spec
 scripts/version_info.txt
 scripts/*.zip
 scripts/*.exe 
+
+# macOS
+.DS_Store
+
+# BleedMakr specific - nepotřebné pro aktuální funkční verzi
+c_extension/
+edge_detection.c
+setup_edge_detection.py
+cursor_probl_m_s_propisov_n_m_build_na.md
+logs/
+*.log
+build_TEST/
+backup_working_version_*/
+github build/
+
+# Testovací a vývojové soubory
+test_*.py
+*_test.py
+benchmark.py
+integration_example.py
+SUMMARY.md
+COMPILE.md
+
+# Dočasné soubory
+*.tmp
+*.temp
+*.bak
+*.backup 
