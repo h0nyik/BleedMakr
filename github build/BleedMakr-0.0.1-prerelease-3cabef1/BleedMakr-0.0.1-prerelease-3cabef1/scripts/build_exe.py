@@ -14,9 +14,8 @@ from pathlib import Path
 
 # --- Přidáno: kontrola na složku numpy v aktuálním adresáři ---
 if os.path.isdir('numpy'):
-    print('[ERROR] V aktuálním adresáři je složka numpy! To způsobí chybu při importu numpy.')
-    print('  Smažte nebo přesuňte složku numpy mimo projekt nebo build adresář a spusťte build znovu.')
-    sys.exit(1)
+    print('[WARNING] V aktuálním adresáři je složka numpy! To může způsobit chybu při importu numpy.')
+    print('  Smažte nebo přesuňte složku numpy mimo projekt, nebo build adresář.')
 # --- konec kontroly ---
 
 def get_platform_info():
@@ -100,40 +99,6 @@ def create_spec_file():
         console_setting = "False"  # GUI aplikace
         icon_setting = "None"
     
-    # Detekce numpy binárních souborů
-    try:
-        import numpy
-        numpy_path = os.path.dirname(numpy.__file__)
-        numpy_binaries = []
-        
-        # Přidání numpy._core DLL souborů
-        core_path = os.path.join(numpy_path, '_core')
-        if os.path.exists(core_path):
-            for file in os.listdir(core_path):
-                if file.endswith('.pyd') or file.endswith('.dll'):
-                    numpy_binaries.append((os.path.join(core_path, file), 'numpy/_core'))
-        
-        # Přidání numpy.random DLL souborů
-        random_path = os.path.join(numpy_path, 'random')
-        if os.path.exists(random_path):
-            for file in os.listdir(random_path):
-                if file.endswith('.pyd') or file.endswith('.dll'):
-                    numpy_binaries.append((os.path.join(random_path, file), 'numpy/random'))
-        
-        # Přidání numpy.fft DLL souborů
-        fft_path = os.path.join(numpy_path, 'fft')
-        if os.path.exists(fft_path):
-            for file in os.listdir(fft_path):
-                if file.endswith('.pyd') or file.endswith('.dll'):
-                    numpy_binaries.append((os.path.join(fft_path, file), 'numpy/fft'))
-        
-        binaries_str = str(numpy_binaries)
-        print(f"[NUMPY] Nalezeno {len(numpy_binaries)} numpy binárních souborů")
-        
-    except Exception as e:
-        print(f"[WARNING] Chyba při detekci numpy binárních souborů: {e}")
-        binaries_str = "[]"
-    
     spec_content = f'''# -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
@@ -151,25 +116,6 @@ hidden_imports = [
     'PIL.ImageOps',
     'fitz',
     'numpy',
-    'numpy.core._methods',
-    'numpy.lib.format',
-    'numpy._core',
-    'numpy._core._multiarray_umath',
-    'numpy._core.multiarray',
-    'numpy._core.umath',
-    'numpy.random',
-    'numpy.random._pickle',
-    'numpy.random._sfc64',
-    'numpy.random._philox',
-    'numpy.random._pcg64',
-    'numpy.random._mt19937',
-    'numpy.random.mtrand',
-    'numpy.random.bit_generator',
-    'numpy.random._generator',
-    'numpy.random._bounded_integers',
-    'numpy.random._common',
-    'numpy.fft',
-    'numpy.fft._pocketfft_umath',
     'io',
     'threading',
     'queue',
@@ -209,39 +155,70 @@ excludes = [
 a = Analysis(
     ['{main_file}'],
     pathex=['src', '../src'],
-    binaries={binaries_str},
+    binaries=[],
     datas={data_files},
     hiddenimports=hidden_imports,
-    hookspath=['.'],
+    hookspath=[],
     hooksconfig={{}},
     runtime_hooks=[],
     excludes=excludes,
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
     noarchive=False,
-    optimize=0,
 )
 
+# Optimalizace - odstraneni nepotrebnych souboru
+def remove_unnecessary_files(a):
+    """Odstrani nepotrebne soubory z analyzy"""
+    # Filtrace binarnich souboru
+    a.binaries = [x for x in a.binaries if not any(
+        exclude in x[0].lower() for exclude in [
+            'api-ms-win', 'ucrtbase', 'msvcp', 'vcruntime',
+            'concrt', 'mfc', 'atl', 'msvcr', 'vcomp'
+        ]
+    )]
+    
+    # Filtrace pure modulu
+    a.pure = [x for x in a.pure if not any(
+        exclude in x[0].lower() for exclude in [
+            'test', 'tests', 'testing', 'unittest',
+            'doctest', 'pydoc', 'distutils', 'setuptools',
+            'pip', 'wheel', 'pkg_resources'
+        ]
+    )]
+    
+    return a
+
+a = remove_unnecessary_files(a)
+
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+# Detekce GitHub Actions pro vypnuti UPX
+use_upx = os.getenv('GITHUB_ACTIONS') != 'true'
 
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
+    a.zipfiles,
     a.datas,
     [],
-    name='{exe_name}',
+    name='BleedMakr',
     debug=False,
     bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
+    strip=True,  # Optimalizace velikosti .exe
+    upx=use_upx,  # Vypnout UPX na GitHub Actions
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,
+    console={console_setting},  # GUI aplikace
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,
+    icon={icon_setting},
+    version='version_info.txt' if os.path.exists('version_info.txt') else None
 )
 '''
     
@@ -339,28 +316,6 @@ def install_dependencies():
     
     return True
 
-def run_pyinstaller():
-    """Spustí PyInstaller s optimalizovanými parametry"""
-    print("\n[BUILD] Spouštím PyInstaller...")
-    
-    # Parametry pro PyInstaller - pouze základní, numpy je už v .spec
-    cmd = [
-        'pyinstaller',
-        '--clean',
-        '--noconfirm',
-        'BleedMakr.spec'
-    ]
-    
-    try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print(f"[BUILD] PyInstaller dokončen úspěšně")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"[ERROR] PyInstaller selhal: {e}")
-        print(f"[ERROR] Stdout: {e.stdout}")
-        print(f"[ERROR] Stderr: {e.stderr}")
-        return False
-
 def build_exe():
     """Sestavi .exe soubor"""
     print("\nSestavovani aplikace...")
@@ -379,7 +334,8 @@ def build_exe():
         return False
     
     # Sestaveni
-    if not run_pyinstaller():
+    cmd = "pyinstaller --clean --noconfirm BleedMakr.spec"
+    if not run_command(cmd, f"Sestavovani pomoci PyInstaller pro {platform_name}"):
         print("CHYBA: PyInstaller selhal")
         # Diagnostika
         if os.path.exists('build'):
@@ -394,10 +350,6 @@ def build_exe():
         size_mb = exe_path.stat().st_size / (1024 * 1024)
         print(f"OK: Uspechne vytvoren: {exe_path}")
         print(f"   Velikost: {size_mb:.1f} MB")
-        # Výpis obsahu dist/ pro kontrolu
-        print("   Obsah dist/:")
-        for item in os.listdir('dist'):
-            print(f"     {item}")
         return True
     else:
         print(f"CHYBA: {exe_name} nebyl vytvoren")

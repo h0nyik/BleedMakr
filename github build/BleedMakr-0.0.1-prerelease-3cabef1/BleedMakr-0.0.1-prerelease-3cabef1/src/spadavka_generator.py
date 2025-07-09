@@ -26,8 +26,6 @@ import threading
 from datetime import datetime
 import json
 import time
-import numpy as np
-from spadavka_engine import SpadavkaEngine
 try:
     from tkinterdnd2 import DND_FILES, TkinterDnD
     DND_AVAILABLE = True
@@ -470,6 +468,8 @@ class SpadavkaGenerator:
         self.progress['value'] = 0
         
         try:
+            from spadavka_engine import SpadavkaEngine
+            
             engine = SpadavkaEngine(self.spadavka_size)
             total_files = len(self.input_files)
             successful = 0
