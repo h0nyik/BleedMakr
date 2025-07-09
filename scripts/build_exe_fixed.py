@@ -54,19 +54,7 @@ def run_command(cmd, description):
     print(f"   Command: {cmd}")
     
     try:
-        # Set UTF-8 encoding for subprocess
-        env = os.environ.copy()
-        env['PYTHONIOENCODING'] = 'utf-8'
-        
-        result = subprocess.run(
-            cmd, 
-            shell=True, 
-            check=True, 
-            capture_output=True, 
-            text=True, 
-            encoding='utf-8',
-            env=env
-        )
+        result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True, encoding='utf-8')
         if result.stdout:
             print(f"   [OK] {result.stdout.strip()}")
         if result.stderr:
@@ -341,15 +329,11 @@ def install_dependencies():
     if not run_command("pip install pyinstaller", "Installing PyInstaller"):
         return False
     
-    # Check for UPX (optional) - with proper encoding
-    try:
-        upx_result = subprocess.run(['upx', '--version'], capture_output=True, text=True, encoding='utf-8')
-        if upx_result.returncode == 0:
-            print("INFO: UPX is installed - .exe will be smaller")
-        else:
-            print("INFO: UPX is not installed - .exe will be larger")
-            print("   You can download from: https://upx.github.io/")
-    except (FileNotFoundError, subprocess.CalledProcessError):
+    # Check for UPX (optional)
+    upx_result = subprocess.run(['upx', '--version'], capture_output=True, text=True)
+    if upx_result.returncode == 0:
+        print("INFO: UPX is installed - .exe will be smaller")
+    else:
         print("INFO: UPX is not installed - .exe will be larger")
         print("   You can download from: https://upx.github.io/")
     
