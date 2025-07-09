@@ -35,6 +35,25 @@ jobs:
         cd scripts
         python build_exe.py
     
+    - name: Sign Windows executable
+      run: |
+        cd scripts
+        $cert = Get-ChildItem -Path "Cert:\CurrentUser\My" | Where-Object {$_.Subject -like "*BleedMakr*"} | Select-Object -First 1
+        if (-not $cert) {
+          Write-Host "Vytvářím nový certifikát pro podpis..."
+          $cert = New-SelfSignedCertificate -Subject "CN=BleedMakr, O=BleedMakr Team, C=CZ" -Type CodeSigningCert -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(3)
+          Write-Host "Certifikát vytvořen: $($cert.Thumbprint)"
+        } else {
+          Write-Host "Používám existující certifikát: $($cert.Thumbprint)"
+        }
+        
+        $result = Set-AuthenticodeSignature -FilePath "dist\BleedMakr-windows.exe" -Certificate $cert
+        if ($result.Status -eq "UnknownError" -or $result.Status -eq "Valid") {
+          Write-Host "✅ Aplikace podepsána úspěšně"
+        } else {
+          Write-Host "⚠️ Podpis s varováním: $($result.StatusMessage)"
+        }
+    
     - name: Rename Windows executable
       run: |
         cd scripts/dist

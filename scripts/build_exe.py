@@ -249,6 +249,7 @@ exe = EXE(
         f.write(spec_content)
     
     print(f"OK: Vytvoren optimalizovany .spec soubor pro {platform_name}")
+    return True
 
 def create_version_info():
     """Vytvori version info soubor pro Windows exe"""
@@ -354,11 +355,85 @@ def run_pyinstaller():
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         print(f"[BUILD] PyInstaller dokončen úspěšně")
+        if result.stdout:
+            print(f"   [INFO] {result.stdout.strip()}")
+        if result.stderr:
+            print(f"   [WARNING] {result.stderr.strip()}")
         return True
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] PyInstaller selhal: {e}")
-        print(f"[ERROR] Stdout: {e.stdout}")
-        print(f"[ERROR] Stderr: {e.stderr}")
+        if e.stdout:
+            print(f"[ERROR] Stdout: {e.stdout}")
+        if e.stderr:
+            print(f"[ERROR] Stderr: {e.stderr}")
+        return False
+
+def sign_executable(exe_path):
+    """Podepíše .exe soubor digitálním certifikátem"""
+    print("\n[PODPIS] Podepisuji aplikaci...")
+    
+    try:
+        # PowerShell příkazy pro vytvoření certifikátu a podpis
+        ps_commands = [
+            # Vytvoření certifikátu (pokud neexistuje)
+            f'''$cert = Get-ChildItem -Path "Cert:\\CurrentUser\\My" | Where-Object {{$_.Subject -like "*BleedMakr*"}} | Select-Object -First 1
+if (-not $cert) {{
+    Write-Host "  Vytvářím nový certifikát pro podpis..."
+    $cert = New-SelfSignedCertificate -Subject "CN=BleedMakr, O=BleedMakr Team, C=CZ" -Type CodeSigningCert -CertStoreLocation "Cert:\\CurrentUser\\My" -NotAfter (Get-Date).AddYears(3)
+    Write-Host "  Certifikát vytvořen: $($cert.Thumbprint)"
+}} else {{
+    Write-Host "  Používám existující certifikát: $($cert.Thumbprint)"
+}}''',
+            
+            # Podpis aplikace
+            f'''$result = Set-AuthenticodeSignature -FilePath "{exe_path}" -Certificate $cert
+if ($result.Status -eq "UnknownError" -or $result.Status -eq "Valid") {{
+    Write-Host "  ✅ Aplikace podepsána úspěšně"
+    Write-Host "  Certifikát: $($cert.Thumbprint)"
+    exit 0
+}} else {{
+    Write-Host "  ⚠️ Podpis s varováním: $($result.StatusMessage)"
+    exit 0
+}}'''
+        ]
+        
+        # Spuštění PowerShell příkazů
+        for i, ps_cmd in enumerate(ps_commands):
+            print(f"  Krok {i+1}: {'Vytvoření certifikátu' if i == 0 else 'Podpis aplikace'}")
+            
+            # Vytvoření dočasného PowerShell skriptu
+            temp_script = f"temp_sign_{i}.ps1"
+            with open(temp_script, 'w', encoding='utf-8') as f:
+                f.write(ps_cmd)
+            
+            try:
+                # Spuštění PowerShell skriptu
+                result = subprocess.run([
+                    'powershell', '-ExecutionPolicy', 'Bypass', '-File', temp_script
+                ], capture_output=True, text=True, check=True)
+                
+                if result.stdout:
+                    print(f"    {result.stdout.strip()}")
+                if result.stderr:
+                    print(f"    [WARNING] {result.stderr.strip()}")
+                    
+            except subprocess.CalledProcessError as e:
+                print(f"    [ERROR] PowerShell chyba: {e}")
+                if e.stdout:
+                    print(f"    Stdout: {e.stdout}")
+                if e.stderr:
+                    print(f"    Stderr: {e.stderr}")
+                return False
+            finally:
+                # Smazání dočasného skriptu
+                if os.path.exists(temp_script):
+                    os.remove(temp_script)
+        
+        print("  ✅ Podpis dokončen")
+        return True
+        
+    except Exception as e:
+        print(f"  ❌ Chyba při podpisu: {e}")
         return False
 
 def build_exe():
@@ -367,58 +442,42 @@ def build_exe():
     
     platform_name, platform_ext, exe_name = get_platform_info()
     
-    # Vycisleni predchozich buildu
-    for dir_name in ['build', 'dist', '__pycache__']:
-        if os.path.exists(dir_name):
-            shutil.rmtree(dir_name)
-            print(f"   Vycisleno: {dir_name}")
+    # Vyčištění
+    for folder in ['build', 'dist', '__pycache__']:
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
+            print(f"   Vycisleno: {folder}")
     
-    # Kontrola .spec souboru
-    if not os.path.exists('BleedMakr.spec'):
-        print("CHYBA: BleedMakr.spec neexistuje")
+    # Vytvoření .spec souboru
+    if not create_spec_file():
         return False
     
-    # Sestaveni
+    # Sestavení
     if not run_pyinstaller():
         print("CHYBA: PyInstaller selhal")
-        # Diagnostika
-        if os.path.exists('build'):
-            print("   Obsah build/:")
-            for item in os.listdir('build'):
-                print(f"     {item}")
         return False
     
-    # Kontrola vysledku
-    exe_path = Path(f"dist/{exe_name}")
-    if exe_path.exists():
-        size_mb = exe_path.stat().st_size / (1024 * 1024)
-        print(f"OK: Uspechne vytvoren: {exe_path}")
-        print(f"   Velikost: {size_mb:.1f} MB")
-        # Výpis obsahu dist/ pro kontrolu
-        print("   Obsah dist/:")
-        for item in os.listdir('dist'):
-            print(f"     {item}")
-        return True
-    else:
-        print(f"CHYBA: {exe_name} nebyl vytvoren")
-        
-        # Diagnostika
-        print("   Diagnostika:")
-        if os.path.exists('dist'):
-            print("     Obsah dist/:")
-            for item in os.listdir('dist'):
-                print(f"       {item}")
-        else:
-            print("     Adresar dist/ neexistuje")
-        
-        if os.path.exists('build'):
-            print("     Obsah build/:")
-            for item in os.listdir('build'):
-                print(f"       {item}")
-        else:
-            print("     Adresar build/ neexistuje")
-        
+    # Kontrola výsledku
+    exe_path = os.path.join('dist', exe_name)
+    if not os.path.exists(exe_path):
+        print("CHYBA: .exe soubor nebyl vytvořen")
         return False
+    
+    # Podpis aplikace
+    if platform.system().lower() == "windows":
+        sign_executable(exe_path)
+    
+    # Výpis informací
+    size_mb = os.path.getsize(exe_path) / (1024 * 1024)
+    print(f"OK: Uspechne vytvoren: {exe_path}")
+    print(f"   Velikost: {size_mb:.1f} MB")
+    
+    # Výpis obsahu dist/
+    print("   Obsah dist/:")
+    for item in os.listdir('dist'):
+        print(f"     {item}")
+    
+    return True
 
 def create_release_package():
     """Vytvori balicek pro release"""
@@ -500,7 +559,6 @@ def main():
         return False
     
     # Vytvoreni konfiguracnich souboru
-    create_spec_file()
     create_version_info()
     
     # Sestaveni aplikace
