@@ -178,7 +178,6 @@ hidden_imports = [
     'PIL.ImageOps',
     'fitz',
     'numpy',
-    'numpy.core._methods',
     'numpy.lib.format',
     'numpy._core',
     'numpy._core._multiarray_umath',
