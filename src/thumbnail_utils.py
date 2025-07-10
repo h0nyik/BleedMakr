@@ -1,5 +1,7 @@
 import threading
 from PIL import Image
+# Zvýšení limitu pro velké obrázky (pro tiskové PDF s vysokým rozlišením)
+Image.MAX_IMAGE_PIXELS = None  # Odstranění limitu pro tiskové aplikace
 import os
 
 class ThumbnailManager:

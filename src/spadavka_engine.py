@@ -1,5 +1,7 @@
 import os
 from PIL import Image, ImageOps
+# Zvýšení limitu pro velké obrázky (pro tiskové PDF s vysokým rozlišením)
+Image.MAX_IMAGE_PIXELS = None  # Odstranění limitu pro tiskové aplikace
 import fitz  # PyMuPDF
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -459,7 +461,7 @@ class SpadavkaEngine:
                     raise ValueError("Obrázek je příliš malý pro zpracování")
                 new_width = width + (2 * self.spadavka_size_px)
                 new_height = height + (2 * self.spadavka_size_px)
-                if new_width * new_height > 100000000:
+                if new_width * new_height > 1000000000:  # Zvýšeno na 1 miliardu pixelů pro tiskové aplikace
                     raise ValueError("Obrázek je příliš velký pro zpracování")
                 new_img = self._create_intelligent_spadavka(work_img, width, height, new_width, new_height, original_mode)
                 # Pokud je původní mód jiný než RGB, převedeme zpět
@@ -499,6 +501,20 @@ class SpadavkaEngine:
             pix = page.get_pixmap(matrix=matrix, alpha=False)
             img = Image.open(io.BytesIO(pix.tobytes("png")))
             spadavka_px = int(spadavka_points * scale_factor)
+            
+            # Kontrola velikosti bitmapy pro velké PDF
+            bitmap_size = img.size[0] * img.size[1]
+            if bitmap_size > 1000000000:  # 1 miliarda pixelů
+                print(f"[WARNING] Velka bitmapa detekovana: {bitmap_size:,} pixelu")
+                print(f"[WARNING] Snizuji DPI pro zpracovani...")
+                # Snížení DPI pro velké PDF
+                dpi = 150  # Poloviční rozlišení
+                scale_factor = dpi / 72
+                matrix = fitz.Matrix(scale_factor, scale_factor)
+                pix = page.get_pixmap(matrix=matrix, alpha=False)
+                img = Image.open(io.BytesIO(pix.tobytes("png")))
+                spadavka_px = int(spadavka_points * scale_factor)
+                print(f"[WARNING] Nove rozmery bitmapy: {img.size[0]}x{img.size[1]} px (DPI: {dpi})")
             
             print(f"[DIAGNOSTIKA] Puvodni PDF: {original_width:.1f}x{original_height:.1f} bodu")
             print(f"[DIAGNOSTIKA] Bitmapa: {img.size[0]}x{img.size[1]} px")

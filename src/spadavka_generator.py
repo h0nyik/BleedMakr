@@ -21,6 +21,8 @@ for pkg, pip_name in required_packages:
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 from PIL import Image, ImageTk, ImageOps
+# Zvýšení limitu pro velké obrázky (pro tiskové PDF s vysokým rozlišením)
+Image.MAX_IMAGE_PIXELS = None  # Odstranění limitu pro tiskové aplikace
 import os
 import threading
 from datetime import datetime
