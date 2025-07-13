@@ -28,7 +28,7 @@ jobs:
         with:
           major_pattern: "(MAJOR|BREAKING CHANGE)"
           minor_pattern: "(MINOR|feat)"
-          patch_pattern: "(PATCH|fix|docs|style|refactor|test|chore)"
+          bump_each_commit_patch_pattern: "(PATCH|fix|docs|style|refactor|test|chore)"
           version_format: "${major}.${minor}.${patch}"
           bump_each_commit: true
           tag_prefix: "v"
