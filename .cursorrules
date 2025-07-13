@@ -4,6 +4,52 @@
 
 Před každým commit a push na GitHub MUSÍŠ zkontrolovat a případně upravit verzi podle těchto pravidel:
 
+## GitHub Actions - Automatický CI/CD Pipeline
+
+### Aktuální workflow soubory:
+- **`.github/workflows/versioning.yml`** - Automatické verzování
+- **`.github/workflows/build-release.yml`** - Auto Build (Prerelease)
+- **`.github/workflows/create-release.yml`** - Create Official Release
+
+### Jak funguje automatický systém:
+
+**1. Auto Versioning (versioning.yml):**
+- Spouští se na každý push na master
+- Automaticky zvyšuje verzi podle commit messages:
+  - `feat:` → MINOR verze (0.1.0, 0.2.0, ...)
+  - `fix:` → PATCH verze (0.0.1, 0.0.2, ...)
+  - `BREAKING CHANGE` → MAJOR verze (1.0.0, 2.0.0, ...)
+- Kontroluje major verze a upozorní na nutnost schválení
+- Aktualizuje version.txt a vytváří Git tagy
+
+**2. Auto Build (build-release.yml):**
+- Spouští se na každý push na master
+- Vytváří prerelease s označením `v{verze}-prerelease-{commit}`
+- Automaticky generuje changelog z commitů
+- Build pro všechny platformy (Windows, macOS, Linux)
+
+**3. Create Official Release (create-release.yml):**
+- Pouze manuální spuštění přes workflow_dispatch
+- Vyžaduje zadání verze (např. 1.0.0)
+- Vytváří oficiální release s detailním changelogem
+- Obsahuje všechny platformy a podrobné informace
+
+### Pravidla pro GitHub Actions:
+- **NEUPRAVUJ** workflow soubory bez konzultace
+- **Zachovej** automatické verzování a buildy
+- **Major verze** (1.0.0+) vyžadují manuální schválení
+- **Changelog** se generuje automaticky z commitů
+- **Prerelease** se tvoří na každý push na master
+- **Oficiální release** pouze manuálně
+
+### Commit message formát pro automatické verzování:
+```
+feat: přidána podpora pro nový formát souborů
+fix: oprava chyby při zpracování PDF
+docs: aktualizace README
+BREAKING CHANGE: změněno API pro zpracování
+```
+
 ## Struktura a přehlednost projektu
 
 ### Pravidla pro organizaci souborů a složek:
@@ -57,16 +103,17 @@ Před každým commit a push na GitHub MUSÍŠ zkontrolovat a případně upravi
 
 ### Soubory k úpravě při změně verze:
 
-1. **version.txt** - hlavní soubor s verzí
+1. **version.txt** - hlavní soubor s verzí (automaticky aktualizován)
 2. **README.md** - badge s verzí
 3. **spadavka_generator.py** - verze v aplikaci
-4. **Git tag** - vytvořit tag po push
+4. **Git tag** - vytvořen automaticky
 
 ### Commit message formát:
 ```
-feat: přidána podpora pro nový formát souborů (MINOR)
-fix: oprava chyby při zpracování PDF (PATCH)  
-BREAKING CHANGE: změněno API pro zpracování (MAJOR)
+feat: přidána podpora pro nový formát souborů
+fix: oprava chyby při zpracování PDF
+docs: aktualizace README
+BREAKING CHANGE: změněno API pro zpracování
 ```
 
 ### Pravidla pro commit messages:
@@ -74,62 +121,40 @@ BREAKING CHANGE: změněno API pro zpracování (MAJOR)
 - První řádek max 50 znaků
 - Popis změny v češtině
 - Pokud je potřeba detailnější popis, použij prázdný řádek a pokračuj
-- Vždy uveď typ změny (MAJOR/MINOR/PATCH) v závorce
+- **NEPIŠ** typ změny v závorce - automatické verzování to určí samo
 
-### Automatické akce před push:
+### Automatické akce při push:
 1. Zkontroluj změny v kódu
 2. Urči typ změny (MAJOR/MINOR/PATCH)
-3. **POZOR: Verze se NEMĚNÍ automaticky - čekáme na vyřešení problémů s buildy**
-4. Commit s popisným message (bez změny verze)
-5. Push na GitHub
-6. **Git tag se vytváří pouze po osobním pokynu**
+3. **Commit s popisným message** podle konvenčního formátu
+4. Push na GitHub
+5. **Automaticky se spustí:**
+   - Auto Versioning (zvýší verzi podle commit message)
+   - Auto Build (vytvoří prerelease s changelogem)
+6. **Pro oficiální release** spusť manuálně "Create Official Release"
 
 ### Soubor version.txt:
-Vytvoř soubor `version.txt` s obsahem:
+Obsahuje aktuální verzi, automaticky aktualizován:
 ```
 0.0.1
 ```
 
-### Příklad workflow (POZASTAVENO):
+### Příklad workflow:
 1. Udělal jsem změny → analyzuj typ
-2. Typ: oprava chyby → PATCH (0.0.1 → 0.0.2) **ALE NEZVEŠŤUJEME**
-3. **Verze zůstává 0.0.1 - čekáme na vyřešení buildů**
-4. Commit: "fix: oprava chyby při zpracování EPS souborů (verze zůstává 0.0.1)"
-5. Push
-6. **Git tag se vytváří pouze po osobním pokynu**
-
-### GitHub Actions pro automatické tagování:
-Přidej do .github/workflows/versioning.yml:
-```yaml
-name: Auto Versioning
-on:
-  push:
-    branches: [master]
-jobs:
-  version:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Semantic Version
-        id: version
-        uses: paulhatch/semantic-version@v5.4.0
-      - name: Create Tag
-        run: git tag v${{ steps.version.outputs.version }}
-      - name: Push Tags
-        run: git push origin --tags
-```
+2. Typ: oprava chyby → commit: "fix: oprava chyby při zpracování EPS souborů"
+3. Push na GitHub
+4. Automaticky: verze 0.0.1 → 0.0.2, vytvoří prerelease
+5. Pro oficiální release: spusť "Create Official Release" manuálně
 
 ### Důležité poznámky:
-- **POZASTAVENO: Verze zůstává 0.0.1 až do vyřešení problémů s buildy**
+- **Automatické verzování je AKTIVNÍ** - verze se zvyšuje podle commit messages
 - Začínáme s verzí 0.0.1 protože jsme v úplně počáteční fázi vývoje
 - Verze 0.1.0 bude až když bude základní API definované
 - Verze 1.0.0 bude až když bude API stabilní a připravené pro produkci
 - Každá změna MUSÍ být commitována s popisným message
-- **Tagy se vytvářejí pouze po osobním pokynu**
-- Pre-release verze používají suffix (např. 0.0.1-alpha.1)
-- Build metadata se přidává za + (např. 0.0.1+build.123)
+- **Major verze vyžadují manuální schválení**
+- Pre-release verze se tvoří automaticky na každý push
+- Oficiální release pouze manuálně
 
 ### Pravidla pro refaktoring a údržbu:
 - Pravidelně refaktoruj kód pro lepší čitelnost
@@ -141,10 +166,9 @@ jobs:
 
 ### Kontrolní seznam před každým push:
 - [ ] Určil jsem správný typ změny
-- [ ] **POZOR: Verze zůstává 0.0.1 - čekáme na vyřešení buildů**
-- [ ] Commit message je popisný (bez změny verze)
-- [ ] **Git tag se vytváří pouze po osobním pokynu**
+- [ ] Commit message je podle konvenčního formátu
 - [ ] Kód je přehledně strukturovaný
 - [ ] Názvy souborů a složek odpovídají konvencím
 - [ ] Testy procházejí (pokud existují)
-- [ ] Dokumentace je aktualizována (pokud je potřeba) 
+- [ ] Dokumentace je aktualizována (pokud je potřeba)
+- [ ] **GitHub Actions zůstávají nezměněné** 

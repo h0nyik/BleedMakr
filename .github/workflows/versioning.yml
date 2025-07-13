@@ -1,29 +1,56 @@
-name: Auto Versioning (DISABLED)
+name: Auto Versioning
 
 on:
-  # Deaktivováno pro první release - spouští se pouze manuálně
+  push:
+    branches: [master]
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to set (e.g. 0.0.1)'
-        required: true
-        default: '0.0.1'
+      force_version:
+        description: 'Force specific version (e.g. 1.0.0)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
 
 jobs:
   version:
     runs-on: windows-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Set Version
+      - name: Semantic Version
         id: version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          major_pattern: "(MAJOR|BREAKING CHANGE)"
+          minor_pattern: "(MINOR|feat)"
+          patch_pattern: "(PATCH|fix|docs|style|refactor|test|chore)"
+          version_format: "${major}.${minor}.${patch}"
+          bump_each_commit: true
+          tag_prefix: "v"
+      
+      - name: Check if major version requires approval
+        id: major_check
         run: |
-          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          echo "Setting version to: ${{ github.event.inputs.version }}"
+          $version = "${{ steps.version.outputs.version }}"
+          $major = $version.Split('.')[0]
+          if ($major -gt 0) {
+            echo "MAJOR_VERSION=true" >> $GITHUB_OUTPUT
+            echo "VERSION=$version" >> $GITHUB_OUTPUT
+          } else {
+            echo "MAJOR_VERSION=false" >> $GITHUB_OUTPUT
+            echo "VERSION=$version" >> $GITHUB_OUTPUT
+          }
+      
+      - name: Force version if provided
+        if: github.event.inputs.force_version != ''
+        run: |
+          echo "VERSION=${{ github.event.inputs.force_version }}" >> $GITHUB_OUTPUT
+          echo "MAJOR_VERSION=true" >> $GITHUB_OUTPUT
       
       - name: Update version.txt
         run: echo "${{ steps.version.outputs.VERSION }}" > version.txt
@@ -40,4 +67,25 @@ jobs:
         run: git tag v${{ steps.version.outputs.VERSION }}
       
       - name: Push Tags
-        run: git push origin --tags 
+        run: git push origin --tags
+      
+      - name: Comment on major version
+        if: steps.major_check.outputs.MAJOR_VERSION == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `⚠️ **Major version detected: ${{ steps.version.outputs.VERSION }}**
+              
+              This version requires manual approval before release.
+              
+              To continue:
+              1. Review code changes
+              2. Verify compatibility
+              3. Run "Create Official Release" workflow manually
+              
+              Commit: ${{ github.sha }}`
+            }) 

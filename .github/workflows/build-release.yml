@@ -1,9 +1,8 @@
-name: Build & Release
+name: Auto Build (Prerelease)
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -125,22 +124,69 @@ jobs:
         path: scripts/dist/
         retention-days: 30
 
-  create-release:
+  create-prerelease:
     needs: [build-windows, build-macos, build-linux]
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
     - name: Download all artifacts
       uses: actions/download-artifact@v4
-    - name: Get tag name
-      id: tag
-      run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
     - name: Get commit SHA
       id: commit
       run: echo "SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
     - name: Get current date
       id: date
       run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+    - name: Get version from version.txt
+      id: version
+      run: echo "VERSION=$(cat version.txt)" >> $GITHUB_OUTPUT
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Získání commitů od posledního tagu
+        if git describe --tags --abbrev=0 2>/dev/null; then
+          LAST_TAG=$(git describe --tags --abbrev=0)
+          COMMITS=$(git log --oneline --no-merges ${LAST_TAG}..HEAD)
+        else
+          COMMITS=$(git log --oneline --no-merges)
+        fi
+        
+        # Kategorizace commitů
+        FEATURES=""
+        FIXES=""
+        DOCS=""
+        OTHER=""
+        
+        while IFS= read -r commit; do
+          if [[ $commit =~ ^[a-f0-9]{7}\ feat: ]]; then
+            FEATURES+="- ${commit#*feat: }"$'\n'
+          elif [[ $commit =~ ^[a-f0-9]{7}\ fix: ]]; then
+            FIXES+="- ${commit#*fix: }"$'\n'
+          elif [[ $commit =~ ^[a-f0-9]{7}\ docs: ]]; then
+            DOCS+="- ${commit#*docs: }"$'\n'
+          else
+            OTHER+="- ${commit}"$'\n'
+          fi
+        done <<< "$COMMITS"
+        
+        # Vytvoření changelogu
+        CHANGELOG="## Changelog\n\n"
+        if [ ! -z "$FEATURES" ]; then
+          CHANGELOG+="### 🚀 Nové funkce\n$FEATURES\n"
+        fi
+        if [ ! -z "$FIXES" ]; then
+          CHANGELOG+="### 🐛 Opravy\n$FIXES\n"
+        fi
+        if [ ! -z "$DOCS" ]; then
+          CHANGELOG+="### 📚 Dokumentace\n$DOCS\n"
+        fi
+        if [ ! -z "$OTHER" ]; then
+          CHANGELOG+="### 🔧 Ostatní změny\n$OTHER\n"
+        fi
+        
+        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+        echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
     - name: List downloaded files
       run: |
         echo "=== Windows files ==="
@@ -149,37 +195,40 @@ jobs:
         ls -la ./BleedMakr-macOS-x64/ || echo "macOS files not found"
         echo "=== Linux files ==="
         ls -la ./BleedMakr-Linux-x64/ || echo "Linux files not found"
-    - name: Create Release
+    - name: Create Prerelease
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.tag.outputs.TAG }}
-        name: BleedMakr ${{ steps.tag.outputs.TAG }}
+        tag_name: v${{ steps.version.outputs.VERSION }}-prerelease-${{ steps.commit.outputs.SHA }}
+        name: "[PRE] v${{ steps.version.outputs.VERSION }} [${{ steps.commit.outputs.SHA }}]"
         body: |
-          ## BleedMakr ${{ steps.tag.outputs.TAG }}
+          ## BleedMakr v${{ steps.version.outputs.VERSION }} - Prerelease
           
-          **Datum:** ${{ steps.date.outputs.DATE }}
+          **Date:** ${{ steps.date.outputs.DATE }}
           **Commit:** ${{ github.sha }}
-          **Tag:** ${{ steps.tag.outputs.TAG }}
+          **Version:** ${{ steps.version.outputs.VERSION }}
           
-          ### Co je nového
-          - Oficiální release ${{ steps.tag.outputs.TAG }}
-          - Všechny platformy (Windows, macOS, Linux)
+          ### ⚠️ Note
+          This is a **prerelease** build from automatic CI/CD pipeline.
+          For official release use manual workflow "Create Official Release".
+          
+          ### 📦 What's included
+          - Automatic build from master branch
+          - All platforms (Windows, macOS, Linux)
           - Python 3.12
           
-          ### Funkce
-          - Automatická detekce a generování spadávky
-          - Zachování vektorového středu PDF
-          - Inteligentní bitmapové okraje s plynulým napojením
-          - Podpora formátů: PDF, EPS, TIFF, JPG, PNG
-          - Moderní GUI s drag&drop, náhledy a detailním logem
-          - Inteligentní detekce bílých okrajů
-          - Batch zpracování více souborů
-          - Export do PDF s vysokým rozlišením (300 DPI)
+          ${{ steps.changelog.outputs.CHANGELOG }}
           
-          ### Instalace
-          Stáhněte si soubor pro vaši platformu a spusťte aplikaci.
+          ### 🔧 Features
+          - Automatic detection and generation of bleed
+          - Preservation of vector center in PDF
+          - Intelligent bitmap borders with smooth connection
+          - Supported formats: PDF, EPS, TIFF, JPG, PNG
+          - Modern GUI with drag&drop, previews and detailed log
+          - Intelligent detection of white borders
+          - Batch processing of multiple files
+          - Export to PDF with high resolution (300 DPI)
         draft: false
-        prerelease: false
+        prerelease: true
         files: |
           ./BleedMakr-Windows-x64/BleedMakr-windows.exe
           ./BleedMakr-macOS-x64/BleedMakr-macos
