@@ -213,58 +213,58 @@ jobs:
         body: |
           # 🎉 BleedMakr v${{ github.event.inputs.version }}
           
-          **Release Date:** ${{ steps.date.outputs.DATE }}
+          **Datum vydání:** ${{ steps.date.outputs.DATE }}
           **Commit:** ${{ github.sha }}
-          **Version:** ${{ github.event.inputs.version }}
+          **Verze:** ${{ github.event.inputs.version }}
           
-          ## 🎯 Official Release
+          ## 🎯 Oficiální vydání
           
-          This is the **official release** of BleedMakr v${{ github.event.inputs.version }}.
+          Toto je **oficiální vydání** BleedMakr v${{ github.event.inputs.version }}.
           
           ${{ steps.changelog.outputs.CHANGELOG }}
           
-          ## 🔧 Main Features
+          ## 🔧 Hlavní funkce
           
-          - **Automatic detection and generation of bleed** - intelligent algorithm for detecting white borders
-          - **Preservation of vector center in PDF** - center remains vector, only borders are bitmap
-          - **Intelligent bitmap borders** with smooth connection to graphics
-          - **Supported formats**: PDF, EPS, TIFF, JPG, PNG
-          - **Modern GUI** with drag&drop, previews and detailed operation log
-          - **Batch processing** of multiple files with progress bar
-          - **Export to PDF** with high resolution (300 DPI)
-          - **Unlimited processing** - removal of image size limit for print applications
-          - **Automatic diagnostics** - detailed information about processing each file
-          - **Connection check** - automatic check of pixel match on bleed boundaries
-          - **Adaptive DPI** - automatic resolution reduction for very large PDFs
-          - **Color matching** - automatic color correction on bleed boundaries
+          - **Automatická detekce a generování bleed** - inteligentní algoritmus pro detekci bílých okrajů
+          - **Zachování vektorového středu v PDF** - střed zůstává vektorový, pouze okraje jsou bitmap
+          - **Inteligentní bitmapové okraje** s plynulým spojením k grafice
+          - **Podporované formáty**: PDF, EPS, TIFF, JPG, PNG
+          - **Moderní GUI** s drag&drop, náhledy a detailní log operací
+          - **Dávkové zpracování** více souborů s progress barem
+          - **Export do PDF** s vysokým rozlišením (300 DPI)
+          - **Neomezené zpracování** - odstranění limitu velikosti obrázků pro tiskové aplikace
+          - **Automatická diagnostika** - detailní informace o zpracování každého souboru
+          - **Kontrola spojení** - automatická kontrola shody pixelů na bleed hranicích
+          - **Adaptivní DPI** - automatické snížení rozlišení pro velmi velké PDF
+          - **Soulad barev** - automatická korekce barev na bleed hranicích
           
-          ## 📦 Installation
+          ## 📦 Instalace
           
-          Download the file for your platform and run the application.
+          Stáhněte soubor pro vaši platformu a spusťte aplikaci.
           
-          ### Requirements
-          - **Windows 10/11** (tested)
-          - **Minimum 4GB RAM**
-          - **500MB free space**
-          - **Ghostscript** (for EPS files)
+          ### Požadavky
+          - **Windows 10/11** (testováno)
+          - **Minimálně 4GB RAM**
+          - **500MB volného místa**
+          - **Ghostscript** (pro EPS soubory)
           
-          ## 🚀 Usage
+          ## 🚀 Použití
           
-          1. **Click "Add Files"** and select graphic files
-          2. **Set bleed size** (default: 3 mm)
-          3. **Select output folder**
-          4. **Click "Generate Bleed"**
+          1. **Klikněte "Add Files"** a vyberte grafické soubory
+          2. **Nastavte velikost bleed** (výchozí: 3 mm)
+          3. **Vyberte výstupní složku**
+          4. **Klikněte "Generate Bleed"**
           
-          ## 🎯 Usage in Advertising Agency
+          ## 🎯 Použití v reklamní agentuře
           
-          The application is optimized for:
-          - **Print materials**: Flyers, brochures, posters
-          - **Digital printing**: Large format prints (up to 2x3m)
-          - **Professional output**: PDF for high-resolution printers
-          - **Batch processing**: Bulk processing of files with progress bar
-          - **Automatic cropping**: Removal of white borders from imported files
-          - **Large format prints**: Support for very large PDFs (up to 1 billion pixels)
-          - **Quality control**: Automatic check of bleed connection to graphics
+          Aplikace je optimalizována pro:
+          - **Tiskové materiály**: Letáky, brožury, plakáty
+          - **Digitální tisk**: Velkoformátové tisky (až 2x3m)
+          - **Profesionální výstup**: PDF pro vysokorozlišené tiskárny
+          - **Dávkové zpracování**: Hromadné zpracování souborů s progress barem
+          - **Automatické ořezávání**: Odstranění bílých okrajů z importovaných souborů
+          - **Velkoformátové tisky**: Podpora velmi velkých PDF (až 1 miliarda pixelů)
+          - **Kontrola kvality**: Automatická kontrola spojení bleed s grafikou
           
           ${{ github.event.inputs.release_notes }}
         draft: false

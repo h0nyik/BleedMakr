@@ -203,30 +203,30 @@ jobs:
         body: |
           ## BleedMakr v${{ steps.version.outputs.VERSION }} - Prerelease
           
-          **Date:** ${{ steps.date.outputs.DATE }}
+          **Datum:** ${{ steps.date.outputs.DATE }}
           **Commit:** ${{ github.sha }}
-          **Version:** ${{ steps.version.outputs.VERSION }}
+          **Verze:** ${{ steps.version.outputs.VERSION }}
           
-          ### ⚠️ Note
-          This is a **prerelease** build from automatic CI/CD pipeline.
-          For official release use manual workflow "Create Official Release".
+          ### ⚠️ Poznámka
+          Toto je **prerelease** build z automatického CI/CD pipeline.
+          Pro oficiální release použij manuální workflow "Create Official Release".
           
-          ### 📦 What's included
-          - Automatic build from master branch
-          - All platforms (Windows, macOS, Linux)
+          ### 📦 Co je zahrnuto
+          - Automatický build z master větve
+          - Všechny platformy (Windows, macOS, Linux)
           - Python 3.12
           
           ${{ steps.changelog.outputs.CHANGELOG }}
           
-          ### 🔧 Features
-          - Automatic detection and generation of bleed
-          - Preservation of vector center in PDF
-          - Intelligent bitmap borders with smooth connection
-          - Supported formats: PDF, EPS, TIFF, JPG, PNG
-          - Modern GUI with drag&drop, previews and detailed log
-          - Intelligent detection of white borders
-          - Batch processing of multiple files
-          - Export to PDF with high resolution (300 DPI)
+          ### 🔧 Funkce
+          - Automatická detekce a generování bleed
+          - Zachování vektorového středu v PDF
+          - Inteligentní bitmapové okraje s plynulým spojením
+          - Podporované formáty: PDF, EPS, TIFF, JPG, PNG
+          - Moderní GUI s drag&drop, náhledy a detailní log
+          - Inteligentní detekce bílých okrajů
+          - Dávkové zpracování více souborů
+          - Export do PDF s vysokým rozlišením (300 DPI)
         draft: false
         prerelease: true
         files: |

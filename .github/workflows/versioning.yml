@@ -55,12 +55,19 @@ jobs:
       - name: Update version.txt
         run: echo "${{ steps.version.outputs.VERSION }}" > version.txt
       
+      - name: Update README.md with current version
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $readme = Get-Content "README.md" -Raw
+          $readme = $readme -replace '!\[Version\]\(https://img\.shields\.io/badge/version-[^)]+\)', "![Version](https://img.shields.io/badge/version-$version-blue)"
+          $readme | Set-Content "README.md"
+      
       - name: Commit version update
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add version.txt
-          git commit -m "chore: update version to ${{ steps.version.outputs.VERSION }}" || exit 0
+          git add version.txt README.md
+          git commit -m "chore: update version to ${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
           git push
       
       - name: Create Tag
