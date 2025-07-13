@@ -2,7 +2,6 @@ name: Build & Release
 
 on:
   push:
-    branches: [ master ]
     tags:
       - 'v*'
   workflow_dispatch:
@@ -133,6 +132,9 @@ jobs:
     - uses: actions/checkout@v4
     - name: Download all artifacts
       uses: actions/download-artifact@v4
+    - name: Get tag name
+      id: tag
+      run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
     - name: Get commit SHA
       id: commit
       run: echo "SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
@@ -150,26 +152,34 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('v0.0.1-build-{0}-{1}', steps.date.outputs.DATE, steps.commit.outputs.SHA) }}
-        name: ${{ github.ref_type == 'tag' && format('BleedMakr {0}', github.ref_name) || format('BleedMakr Build {0} ({1})', steps.date.outputs.DATE, steps.commit.outputs.SHA) }}
+        tag_name: ${{ steps.tag.outputs.TAG }}
+        name: BleedMakr ${{ steps.tag.outputs.TAG }}
         body: |
-          ## BleedMakr Build Release
+          ## BleedMakr ${{ steps.tag.outputs.TAG }}
           
           **Datum:** ${{ steps.date.outputs.DATE }}
           **Commit:** ${{ github.sha }}
-          **Branch:** ${{ github.ref_name }}
+          **Tag:** ${{ steps.tag.outputs.TAG }}
           
           ### Co je nového
-          - Automatický build z master větve
+          - Oficiální release ${{ steps.tag.outputs.TAG }}
           - Všechny platformy (Windows, macOS, Linux)
           - Python 3.12
           
-          ### Poznámky
-          - Toto je automatický build, ne oficiální release (pokud není tag)
-          - Pro oficiální release použijte Git tag
-          - Verze zůstává 0.0.1 až do vyřešení problémů s buildy
+          ### Funkce
+          - Automatická detekce a generování spadávky
+          - Zachování vektorového středu PDF
+          - Inteligentní bitmapové okraje s plynulým napojením
+          - Podpora formátů: PDF, EPS, TIFF, JPG, PNG
+          - Moderní GUI s drag&drop, náhledy a detailním logem
+          - Inteligentní detekce bílých okrajů
+          - Batch zpracování více souborů
+          - Export do PDF s vysokým rozlišením (300 DPI)
+          
+          ### Instalace
+          Stáhněte si soubor pro vaši platformu a spusťte aplikaci.
         draft: false
-        prerelease: ${{ github.ref_type != 'tag' }}
+        prerelease: false
         files: |
           ./BleedMakr-Windows-x64/BleedMakr-windows.exe
           ./BleedMakr-macOS-x64/BleedMakr-macos
