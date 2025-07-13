@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-AGPL%203.0-green.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://www.microsoft.com/windows)
 [![Status](https://img.shields.io/badge/Status-Pre%20Alpha-orange.svg)](https://github.com/h0nyik/BleedMakr)
-[![Version](https://img.shields.io/badge/Version-0.0.1-blue.svg)](https://github.com/h0nyik/BleedMakr/releases)
+[![Version](https://img.shields.io/badge/version-0.0.1-blue)](https://github.com/h0nyik/BleedMakr/releases)
 
 **Profesionální generátor spadávek pro reklamní agentury**
 
