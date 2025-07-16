@@ -108,12 +108,15 @@ def create_spec_file():
     if platform_name == "Windows":
         console_setting = "False"  # GUI application
         icon_setting = "'icon.ico' if os.path.exists('icon.ico') else None"
+        print(f"[ICON] Windows: {'icon.ico' if os.path.exists('icon.ico') else 'NOT FOUND'}")
     elif platform_name == "macOS":
         console_setting = "False"  # GUI application
         icon_setting = "'icon.icns' if os.path.exists('icon.icns') else None"
+        print(f"[ICON] macOS: {'icon.icns' if os.path.exists('icon.icns') else 'NOT FOUND'}")
     else:  # Linux
         console_setting = "False"  # GUI application
-        icon_setting = "None"
+        icon_setting = "'icon.png' if os.path.exists('icon.png') else None"
+        print(f"[ICON] Linux: {'icon.png' if os.path.exists('icon.png') else 'NOT FOUND'}")
     
     # Detect numpy binary files
     try:
@@ -256,7 +259,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,
+    icon={icon_setting},
 )
 '''
     

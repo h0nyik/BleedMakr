@@ -74,14 +74,53 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-    - name: Build macOS App
+    - name: Build macOS App Bundle
       run: |
         cd scripts
         python build_exe.py
+    - name: Create macOS .app bundle
+      run: |
+        cd scripts/dist
+        # Vytvoření .app bundle struktury
+        mkdir -p BleedMakr.app/Contents/MacOS
+        mkdir -p BleedMakr.app/Contents/Resources
+        # Přesunutí spustitelného souboru
+        mv BleedMakr BleedMakr.app/Contents/MacOS/
+        # Vytvoření Info.plist
+        cat > BleedMakr.app/Contents/Info.plist << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleExecutable</key>
+            <string>BleedMakr</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.bleedmakr.app</string>
+            <key>CFBundleName</key>
+            <string>BleedMakr</string>
+            <key>CFBundleVersion</key>
+            <string>0.0.1</string>
+            <key>CFBundleShortVersionString</key>
+            <string>0.0.1</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleSignature</key>
+            <string>????</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>10.14</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+        </dict>
+        </plist>
+        EOF
+        # Vytvoření PkgInfo
+        echo "APPL????" > BleedMakr.app/Contents/PkgInfo
+        # Nastavení oprávnění
+        chmod +x BleedMakr.app/Contents/MacOS/BleedMakr
     - name: Rename macOS executable
       run: |
         cd scripts/dist
-        mv BleedMakr BleedMakr-macos
+        mv BleedMakr.app BleedMakr-macos.app
     - name: Upload macOS Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -231,7 +270,7 @@ jobs:
         prerelease: true
         files: |
           ./BleedMakr-Windows-x64/BleedMakr-windows.exe
-          ./BleedMakr-macOS-x64/BleedMakr-macos
+          ./BleedMakr-macOS-x64/BleedMakr-macos.app
           ./BleedMakr-Linux-x64/BleedMakr-linux
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
