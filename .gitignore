@@ -16,6 +16,8 @@ Thumbs.db
 
 # Cursor AI
 .cursor/
+.cursor/rules
+.cursorrules
 
 # Staré chaty a AI metadata
 *.chat.json
