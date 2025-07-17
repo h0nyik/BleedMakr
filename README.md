@@ -241,3 +241,4 @@ Pokud vám tento projekt pomohl, dejte mu hvězdičku na GitHubu! ⭐
 <!-- Trigger build: testovací změna pro GitHub Actions --> 
 
 
+
