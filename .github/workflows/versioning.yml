@@ -22,6 +22,15 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
       
+      - name: Debug - Show recent commits
+        run: |
+          echo "=== Recent commits ==="
+          git log --oneline -5
+          echo "=== Current version ==="
+          cat version.txt
+          echo "=== Commit message that triggered this workflow ==="
+          echo "${{ github.event.head_commit.message }}"
+      
       - name: Semantic Version
         id: version
         uses: paulhatch/semantic-version@v5.4.0
@@ -32,6 +41,14 @@ jobs:
           version_format: "${major}.${minor}.${patch}"
           bump_each_commit: true
           tag_prefix: "v"
+      
+      - name: Debug - Show version output
+        run: |
+          echo "=== Semantic version output ==="
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Major: ${{ steps.version.outputs.major }}"
+          echo "Minor: ${{ steps.version.outputs.minor }}"
+          echo "Patch: ${{ steps.version.outputs.patch }}"
       
       - name: Check if major version requires approval
         id: major_check
