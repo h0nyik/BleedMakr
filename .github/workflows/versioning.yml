@@ -70,11 +70,32 @@ jobs:
           git commit -m "chore: update version to ${{ steps.version.outputs.VERSION }}" || echo "No changes to commit"
           git push
       
+      - name: Check if tag exists
+        id: tag_check
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $tag_exists = git tag -l "v$version"
+          if ($tag_exists) {
+            echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
+            echo "Tag v$version already exists, skipping tag creation"
+          } else {
+            echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
+          }
+      
       - name: Create Tag
+        if: steps.tag_check.outputs.TAG_EXISTS != 'true'
         run: git tag v${{ steps.version.outputs.VERSION }}
       
       - name: Push Tags
-        run: git push origin --tags
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          if (git tag -l "v$version") {
+            echo "Tag v$version exists, using force push"
+            git push origin v$version --force
+          } else {
+            echo "Tag v$version does not exist, pushing normally"
+            git push origin --tags
+          }
       
       - name: Comment on major version
         if: steps.major_check.outputs.MAJOR_VERSION == 'true'
