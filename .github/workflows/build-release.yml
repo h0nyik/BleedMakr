@@ -55,7 +55,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: BleedMakr-Windows-x64
-        path: scripts/dist/
+        path: dist/
         retention-days: 30
 
   build-macos:
@@ -125,7 +125,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: BleedMakr-macOS-x64
-        path: scripts/dist/
+        path: dist/
         retention-days: 30
 
   build-linux:
@@ -160,7 +160,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: BleedMakr-Linux-x64
-        path: scripts/dist/
+        path: dist/
         retention-days: 30
 
   create-prerelease:
