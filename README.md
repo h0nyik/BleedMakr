@@ -239,3 +239,4 @@ Pokud vám tento projekt pomohl, dejte mu hvězdičku na GitHubu! ⭐
 **BleedMakr** - Profesionální řešení pro generování spadávek v reklamních agenturách 
 
 <!-- Trigger build: testovací změna pro GitHub Actions --> 
+
